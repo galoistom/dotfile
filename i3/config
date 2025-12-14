@@ -202,7 +202,7 @@ bindsym $mod+r mode "resize"
 #        status_command polybar
 #}
 #exec_always --no-startup-id ~/.config/polybar/san/launch.sh
-exec_always --no-startup-id ~/polybar.sh
+exec_always --no-startup-id ~/.config/polybar/scripts/polybar.sh
 exec_always --no-startup-id feh --bg-fill /home/galoistom/Pictures/macos-monterey-wwdc-21-stock-dark-mode-5k-6016x6016-5585.jpg
 exec_always --no-startup-id fcitx5
 for_window [class="^.*"] border pixel 3
