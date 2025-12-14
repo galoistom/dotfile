@@ -1,0 +1,3 @@
+#!/bin/sh
+export KITTY_LISTEN_ON="${KITTY_LISTEN_ON:-unix:/tmp/kitty}"
+exec "$HOME/.config/nnn/plugins/preview-tui" "$@"
