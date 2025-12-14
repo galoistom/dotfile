@@ -1,0 +1,11 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhistcnt =9
+let g:netrw_dirhist_9='/home/galoistom/st'
+let g:netrw_dirhist_8='/home/galoistom/Documents/hello/src'
+let g:netrw_dirhist_7='/home/galoistom/Documents/hello'
+let g:netrw_dirhist_6='/home/galoistom/Documents'
+let g:netrw_dirhist_5='/home/galoistom'
+let g:netrw_dirhist_4='/home/galoistom/Documents/hello/src'
+let g:netrw_dirhist_3='/home/galoistom/Documents/hello'
+let g:netrw_dirhist_2='/home/galoistom/Documents'
+let g:netrw_dirhist_1='/home/galoistom'
