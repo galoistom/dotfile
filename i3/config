@@ -208,9 +208,9 @@ exec_always --no-startup-id fcitx5
 for_window [class="^.*"] border pixel 3
 for_window [class="wechat"] floating enable, move position center
 client.focused          #99ccff #285577dd #ffffff #2e9ef4   #33ccff
-client.focused_inactive #333333 #5f676a #ffffff #484e50   #5f676a
+client.focused_inactive #99ccff #285577dd #ffffff #484e50   #5f676a
 client.unfocused        #99ccff #22222200 #888888 #292d2e   #222222
-client.urgent           #2f343a #900000   #ffffff #900000   #900000
+client.urgent           #2f343a #90000000 #ffffff #900000   #900000
 client.placeholder      #000000 #0c0c0c00 #ffffff #000000   #0c0c0c
 client.background       #ffffff
 gaps inner 6
