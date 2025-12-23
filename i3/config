@@ -23,7 +23,8 @@ font pango:monospace 8
 # https://wiki.archlinux.org/index.php/XDG_Autostart
 exec --no-startup-id dex --autostart --environment i3
 exec --no-startup-id picom
-exec --no-startup-id blueman-applet
+exec --no-startup-id emacs --daemon
+#exec --no-startup-id blueman-applet
 # The combination of xss-lock, nm-applet and pactl is a popular choice, so
 # they are included here as an example. Modify as you see fit.
 
@@ -36,11 +37,11 @@ exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
 exec --no-startup-id nm-applet
 
 # Use pactl to adjust volume in PulseAudio.
-set $refresh_i3status killall -SIGUSR1 i3status
-bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10% && $refresh_i3status
-bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -10% && $refresh_i3status
-bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle && $refresh_i3status
-bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle && $refresh_i3status
+#set $refresh_i3status killall -SIGUSR1 i3status
+bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10% 
+bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -10%
+bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle
+bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle
 bindsym XF86MonBrightnessUp exec brightnessctl s +5%
 bindsym XF86MonBrightnessDown exec brightnessctl s 5%-
 
@@ -58,10 +59,12 @@ bindsym $mod+n exec --no-startup-id kitty -e zsh -i -c nnn
 bindsym $mod+Shift+f exec --no-startup-id zen-browser
 bindsym $mod+p exec --no-startup-id qutebrowser
 bindsym $mod+Shift+p exec --no-startup-id zen-browser --private-window
-bindsym $mod+m exec --no-startup-id emacs
+bindsym $mod+m exec --no-startup-id emacsclient -c
+bindsym $mod+Shift+m exec --no-startup-id emacs --daemon
 bindsym $mod+o exec --no-startup-id obsidian
 bindsym $mod+Shift+s exec --no-startup-id spectacle -r -b
 bindsym $mod+Control+s exec --no-startup-id screen-toggle
+bindsym $mod+semicolon exec --no-startup-id i3lock --color=000000 --clock --time-color=ffffff --date-color=ffffff --time-str="%H:%M" --date-str="%Y-%m-%d" --time-size=48 --date-size=18
 # kill focused window
 bindsym $mod+q kill
 bindsym Mod4+l exec systemctl suspend
@@ -114,7 +117,7 @@ bindsym $mod+w layout tabbed
 bindsym $mod+e layout toggle split
 
 # toggle tiling / floating
-bindsym $mod+Shift+Tab floating toggle
+bindsym $mod+Control+Tab floating toggle
 
 # change focus between tiling / floating windows
 bindsym $mod+Tab focus mode_toggle
@@ -177,16 +180,16 @@ mode "resize" {
         # Pressing right will grow the window’s width.
         # Pressing up will shrink the window’s height.
         # Pressing down will grow the window’s height.
-        bindsym h resize shrink width 10 px or 10 ppt
-        bindsym j resize grow height 10 px or 10 ppt
-        bindsym k resize shrink height 10 px or 10 ppt
-        bindsym l resize grow width 10 px or 10 ppt
+        bindsym h resize shrink width 5 px or 5 ppt
+        bindsym j resize grow height 5 px or 5 ppt
+        bindsym k resize shrink height 5 px or 5 ppt
+        bindsym l resize grow width 5 px or 5 ppt
 
         # same bindings, but for the arrow keys
-        bindsym Left resize shrink width 10 px or 10 ppt
-        bindsym Down resize grow height 10 px or 10 ppt
-        bindsym Up resize shrink height 10 px or 10 ppt
-        bindsym Right resize grow width 10 px or 10 ppt
+        # bindsym Left resize shrink width 10 px or 10 ppt
+        # bindsym Down resize grow height 10 px or 10 ppt
+        # bindsym Up resize shrink height 10 px or 10 ppt
+        # bindsym Right resize grow width 10 px or 10 ppt
 
         # back to normal: Enter or Escape or $mod+r
         bindsym Return mode "default"
@@ -196,14 +199,8 @@ mode "resize" {
 
 bindsym $mod+r mode "resize"
 
-# Start i3bar to display a workspace bar (plus the system information i3status
-# finds out, if available)
-#bar {
-#        status_command polybar
-#}
-#exec_always --no-startup-id ~/.config/polybar/san/launch.sh
 exec_always --no-startup-id ~/.config/polybar/scripts/polybar.sh
-exec_always --no-startup-id feh --bg-fill /home/galoistom/Pictures/macos-monterey-wwdc-21-stock-dark-mode-5k-6016x6016-5585.jpg
+#exec_always --no-startup-id feh --bg-fill /home/galoistom/Pictures/macos-monterey-wwdc-21-stock-dark-mode-5k-6016x6016-5585.jpg
 exec_always --no-startup-id fcitx5
 for_window [class="^.*"] border pixel 3
 for_window [class="wechat"] floating enable, move position center

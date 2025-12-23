@@ -7,14 +7,12 @@ PROFILE=$(powerprofilesctl get)
 case "$PROFILE" in
     "performance")
         # 性能模式：红色图标
-        echo "Perf"  
+        echo "%{F#ff0000}Perf"  
         ;;
     "balanced")
-        # 平衡模式：绿色图标 (通常是默认)
-        echo "%{F#99ccff}Bal"
+        echo "Bal"
         ;;
     "power-saver")
-        # 节能模式：蓝色图标
         echo "%{F#2ecc71}Save"
         ;;
     *)

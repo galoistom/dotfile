@@ -1,0 +1,16 @@
+#!/bin/sh
+file="$1"
+case "$file" in
+  *.zip) unzip "$file" ;;
+  *.tar.gz|*.tgz) tar xzf "$file" ;;
+  *.tar.xz) tar xJf "$file" ;;
+  *.tar.bz2) tar xjf "$file" ;;
+  *.7z) 7z x "$file" ;;
+  *.rar) unrar x "$file" ;;
+  *)
+    echo "Unsupported archive"
+    read -r _
+    exit 1
+    ;;
+esac
+read -r _
