@@ -24,7 +24,16 @@ font pango:monospace 8
 exec --no-startup-id dex --autostart --environment i3
 exec --no-startup-id picom
 exec --no-startup-id emacs --daemon
-#exec --no-startup-id blueman-applet
+exec --no-startup-id xrbd -merge ~/.Xresources
+exec_always --no-startup-id fcitx5 -d
+exec --no-startup-id env \
+  GTK_IM_MODULE=fcitx \
+  QT_IM_MODULE=fcitx \
+  XMODIFIERS=@im=fcitx \
+  dbus-update-activation-environment --systemd \
+    GTK_IM_MODULE QT_IM_MODULE XMODIFIERS
+exec_always --no-startup-id ~/.config/polybar/scripts/polybar.sh
+exec --no-startup-id blueman-applet
 # The combination of xss-lock, nm-applet and pactl is a popular choice, so
 # they are included here as an example. Modify as you see fit.
 
@@ -106,7 +115,7 @@ bindsym $mod+Shift+l move right
 bindsym $mod+t split h
 
 # split in vertical orientation
-bindsym $mod+v split v
+bindsym $mod+b split v
 
 # enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen toggle
@@ -199,9 +208,6 @@ mode "resize" {
 
 bindsym $mod+r mode "resize"
 
-exec_always --no-startup-id ~/.config/polybar/scripts/polybar.sh
-#exec_always --no-startup-id feh --bg-fill /home/galoistom/Pictures/macos-monterey-wwdc-21-stock-dark-mode-5k-6016x6016-5585.jpg
-exec_always --no-startup-id fcitx5
 for_window [class="^.*"] border pixel 3
 for_window [class="wechat"] floating enable, move position center
 client.focused          #99ccff #285577dd #ffffff #2e9ef4   #33ccff

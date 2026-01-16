@@ -88,7 +88,6 @@ nnoremap <ESC> :nohl<CR>
 " vim-startify 配置
 " =======================================
 colorscheme desert
-" 启用最近文件列表 (默认开启)
 let g:startify_enable_special = 1
 
 " 自定义 Header (例如 ASCII 艺术或欢迎语)
@@ -103,7 +102,6 @@ let g:startify_custom_header = [
     \ '       Welcome to Vim!                ',
     \ ]
 
-" 自定义启动页中的项目 (修正 E696 错误)
 let g:startify_bookmarks = [
     \ { 'Config': '~/.vimrc' },
     \ { 'Plugins': '~/.vim/plugged/' },
@@ -111,7 +109,6 @@ let g:startify_bookmarks = [
     \ { 'Help': ':h startify<CR>' } 
     \ ]
 
-" 自定义启动页布局和显示内容 (修正 E696 错误)
 let g:startify_custom_sections = [
     \ '         _.--.           .--._',
     \ '       ( M.R.U.S.I.N.S. )',
@@ -140,4 +137,3 @@ autocmd VimEnter * if !argc() | Startify | endif
 nnoremap <leader>h :Startify<CR>
 
 set omnifunc=syntaxcomplete#Complete
-
