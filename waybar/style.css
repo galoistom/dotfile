@@ -2,7 +2,7 @@
   min-height: 0;
   min-width: 0;
   font-family: Lexend, "JetBrainsMono NFP";
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 600;
 }
 
@@ -18,7 +18,7 @@ window#waybar {
 #workspaces button {
   padding: 0 0.4rem;
   margin: 0;
-  border-radius: 6px;
+  border-radius: 4px;
   /* background-color: #181825; */
   background-color: transparent;
   color: #cdd6f4;
