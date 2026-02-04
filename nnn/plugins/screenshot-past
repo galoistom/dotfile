@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# nnn 当前目录
+DIR="${PWD}"
+
+# 生成文件名
+NAME="screenshot_$(date +%Y%m%d_%H%M%S).png"
+OUT="$DIR/$NAME"
+
+# 判断剪贴板是不是图片
+if wl-paste --list-types | grep -q '^image/'; then
+    wl-paste --no-newline > "$OUT"
+    notify-send "nnn" "screenshot saved as: $NAME"
+else
+    notify-send "nnn" "Not a photo"
+    exit 1
+fi

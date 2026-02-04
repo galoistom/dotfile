@@ -1,0 +1,141 @@
+spawn-at-startup "xwayland-satellite" // 启动你关心的 X11 支持
+spawn-at-startup "waybar"
+spawn-at-startup "mako"
+spawn-at-startup "emacs" "--daemon"
+spawn-at-startup "wl-clip-persist" "--clipboard" "regular"
+spawn-at-startup "localsend"
+spawn-at-startup "swaybg" "-m" "fill" "-i" "/home/galoistom/Pictures/macos-monterey-wwdc-21-stock-dark-mode-5k-6016x6016-5585.jpg"
+prefer-no-csd
+workspace "magic"
+
+input {
+    touchpad {
+        tap
+	accel-speed 0.6
+//        accel-profile "adaptive" // 适应性加速，小动精准，大动飞快
+        dwt // 打字时禁用触控板
+        natural-scroll
+    }
+    focus-follows-mouse max-scroll-amount="0%"
+    warp-mouse-to-focus
+}
+
+cursor{
+xcursor-theme "Bibata-Modern-Classic"
+xcursor-size 15
+}
+
+layout {
+       gaps 5
+       focus-ring {
+       		  width 2
+		  active-color "#bd93f9ff"
+		  inactive-color "#595959aa"
+       }
+       empty-workspace-above-first
+}
+
+recent-windows {
+    // off
+    debounce-ms 750
+
+    open-delay-ms 150
+
+    highlight {
+        active-color "#999999ff"
+        urgent-color "#ff9999ff"
+        padding 30
+        corner-radius 0
+    }
+
+    previews {
+        max-height 480
+        max-scale 0.5
+    }
+
+    binds {
+        Alt+Tab         { next-window; }
+        Alt+Shift+Tab   { previous-window; }
+	}
+}
+
+binds {
+    // 基础操作
+    Alt+Return { spawn "kitty"; }
+    Alt+Q { close-window; }
+    Alt+Shift+E { quit; }
+    Alt+D { spawn "rofi" "-show" "drun"; }
+    Alt+Control+R { spawn-sh "rofi -show power-menu -modi power-menu:rofi-power-menu"; }
+    Mod+Shift+Slash { show-hotkey-overlay; }
+
+    // 应用快捷键
+    Alt+N { spawn "kitty" "-e" "zsh" "-i" "-c" "nnn"; }
+    Alt+O { spawn "sh" "-c" "OBSIDIAN_USE_WAYLAND=1 obsidian --enable-features=UseOzonePlatform --ozone-platform=wayland"; }
+    Alt+I { spawn "qutebrowser"; }
+    Alt+Shift+F { spawn "zen-browser"; }
+    Alt+Shift+P { spawn "zen-browser" "--private-window"; }
+    Alt+M { spawn "emacsclient" "-c"; }
+	Alt+Shift+M {spawn "emacs" "--daemon"; }
+
+    // 焦点切换 (Vim keys)
+    Alt+H { focus-column-left; }
+    Alt+L { focus-column-right; }
+    Alt+J { focus-window-or-workspace-down; }
+    Alt+K { focus-window-or-workspace-up; }
+    
+    // 移动窗口
+    Alt+Shift+H { move-column-left; }
+    Alt+Shift+L { move-column-right; }
+    Mod+Shift+L {spawn "hyprlock"; }
+    Alt+Shift+J     { move-window-down; }
+    Alt+Shift+K     { move-window-up; }
+    Mod+Comma  { consume-window-into-column; }
+    Mod+Period { expel-window-from-column; }
+ 
+    // 窗口尺寸 (对应你的 resizeactive)
+    Mod+H  { set-column-width "-5%"; }
+    Mod+L { set-column-width "+5%"; }
+    Mod+K    { set-window-height "-5%"; }
+    Mod+J  { set-window-height "+5%"; }
+    
+    // 全屏与缩放 (Niri 没有伪平铺，但有内容伸缩)
+    Alt+A { maximize-column; }
+    Mod+W { fullscreen-window; }
+    Mod+Space { toggle-window-floating; }
+    Mod+C { center-window; }
+    Mod+O { toggle-overview; }
+    Mod+T {toggle-column-tabbed-display; }
+    Alt+Shift+U { move-window-to-workspace "magic"; }
+    Alt+U { focus-workspace "magic"; }
+
+    // 截图 (Hyprshot 逻辑迁移)
+    Alt+Shift+S {spawn-sh "hyprshot -m region --clipboard-only"; }
+
+    // 工作区切换 (Workspace -> Niri 的 Workspace 是垂直排列的)
+    Alt+1 { focus-workspace 1; }
+    Alt+2 { focus-workspace 2; }
+    Alt+3 { focus-workspace 3; }
+    Alt+4 { focus-workspace 4; }
+    Alt+5 { focus-workspace 5; }
+    Alt+6 { focus-workspace 6; }
+    Alt+7 { focus-workspace 7; }
+    Alt+8 { focus-workspace 8; }
+    // ...以此类推到 0
+
+    Alt+Shift+1 { move-column-to-workspace 1; }
+    Alt+Shift+2 { move-column-to-workspace 2; }
+    Alt+Shift+3 { move-column-to-workspace 3; }
+    Alt+Shift+4 { move-column-to-workspace 4; }
+    Alt+Shift+5 { move-column-to-workspace 5; }
+    Alt+Shift+6 { move-column-to-workspace 6; }
+    Alt+Shift+7 { move-column-to-workspace 7; }
+    Alt+Shift+8 { move-column-to-workspace 8; }
+    // ...以此类推
+
+    // 笔记本多媒体键
+    XF86AudioRaiseVolume { spawn "wpctl" "set-volume" "-l" "1" "@DEFAULT_AUDIO_SINK@" "5%+"; }
+    XF86AudioLowerVolume { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
+    XF86AudioMute        { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
+    XF86MonBrightnessUp   { spawn "brightnessctl" "set" "5%+"; }
+    XF86MonBrightnessDown { spawn "brightnessctl" "set" "5%-"; }
+}

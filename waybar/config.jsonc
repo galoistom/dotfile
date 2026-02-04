@@ -7,7 +7,7 @@
   "gtk-layer-shell": true,
   "passthrough": false,
   "fixed-center": true,
-  "modules-left": ["hyprland/workspaces","sway/workspaces","hyprland/window"],
+  "modules-left": ["hyprland/workspaces","sway/workspaces","hyprland/window","niri/window"],
   "modules-center": ["clock#simpleclock"],
   "modules-right": [
     "tray",
@@ -31,6 +31,12 @@
       "1": "1", "2": "2", "3": "3", "4": "4", "5": "5",
       "6": "6", "7": "7", "8": "8", "9": "9", "10": "10"
     }
+  },
+  "niri/window": {
+      "format": "{title}",
+      "separate-outputs": true,
+      "icon": true,
+      "icon-size": 18
   },
   "hyprland/window": {
     "format": "{title}",

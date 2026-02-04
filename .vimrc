@@ -48,7 +48,7 @@ set autoindent          " 自动缩进
 "set noexpandtab          " 使用真实 Tab（取消注释启用）
 set guicursor=n:block,i:ver1,r:hor20,v:block,c:block,sm:block
 set mouse=a
-colorscheme sorbet
+"colorscheme sorbet
 let g:NERDTreeKeepTreeInSync = 1
 set clipboard=unnamedplus
 set cursorline
@@ -87,7 +87,7 @@ nnoremap <ESC> :nohl<CR>
 " =======================================
 " vim-startify 配置
 " =======================================
-colorscheme desert
+"colorscheme desert
 let g:startify_enable_special = 1
 
 " 自定义 Header (例如 ASCII 艺术或欢迎语)
