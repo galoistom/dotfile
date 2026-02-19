@@ -1,10 +1,12 @@
 spawn-at-startup "xwayland-satellite" // 启动你关心的 X11 支持
 spawn-at-startup "waybar"
 spawn-at-startup "mako"
+spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 spawn-at-startup "emacs" "--daemon"
+//spawn-at-startup "dbus-update-activation-environment" "--systemd" "WAYLAND_DISPLAY" "XDG_CURRENT_DESKTOP" "NIRI_SOCKET"
 spawn-at-startup "wl-clip-persist" "--clipboard" "regular"
 spawn-at-startup "localsend"
-spawn-at-startup "swaybg" "-m" "fill" "-i" "/home/galoistom/Pictures/macos-monterey-wwdc-21-stock-dark-mode-5k-6016x6016-5585.jpg"
+spawn-at-startup "swaybg" "-m" "fill" "-i" "/home/galoistom/Pictures/12-Dark.jpg"
 prefer-no-csd
 workspace "magic"
 
@@ -64,7 +66,7 @@ binds {
     Alt+Return { spawn "kitty"; }
     Alt+Q { close-window; }
     Alt+Shift+E { quit; }
-    Alt+D { spawn "rofi" "-show" "drun"; }
+    Alt+D { spawn "rofi" "-show" "combi"; }
     Alt+Control+R { spawn-sh "rofi -show power-menu -modi power-menu:rofi-power-menu"; }
     Mod+Shift+Slash { show-hotkey-overlay; }
 
@@ -82,11 +84,12 @@ binds {
     Alt+L { focus-column-right; }
     Alt+J { focus-window-or-workspace-down; }
     Alt+K { focus-window-or-workspace-up; }
+    Mod+F { spawn "rofi" "-show" "window"; }
     
     // 移动窗口
     Alt+Shift+H { move-column-left; }
     Alt+Shift+L { move-column-right; }
-    Mod+Shift+L {spawn "hyprlock"; }
+    Mod+Alt+L {spawn "hyprlock"; }
     Alt+Shift+J     { move-window-down; }
     Alt+Shift+K     { move-window-up; }
     Mod+Comma  { consume-window-into-column; }
@@ -105,6 +108,8 @@ binds {
     Mod+C { center-window; }
     Mod+O { toggle-overview; }
     Mod+T {toggle-column-tabbed-display; }
+    Mod+m  { consume-or-expel-window-left; }
+    Mod+n { consume-or-expel-window-right; }
     Alt+Shift+U { move-window-to-workspace "magic"; }
     Alt+U { focus-workspace "magic"; }
 
@@ -138,4 +143,22 @@ binds {
     XF86AudioMute        { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
     XF86MonBrightnessUp   { spawn "brightnessctl" "set" "5%+"; }
     XF86MonBrightnessDown { spawn "brightnessctl" "set" "5%-"; }
+}
+
+window-rule {
+    // 匹配我们在脚本里设置的 class/app-id
+    match app-id="nnn-picker"
+
+    // 开启浮动模式
+    open-floating true
+
+    // 设置初始位置为居中
+    open-on-output "focused"
+    
+    // 设置窗口大小（根据你的屏幕分辨率调整）
+    default-column-width { proportion 0.5; }
+    default-window-height { proportion 0.6; }
+
+    // 这里的关键：强制居中
+    // Niri 默认浮动窗口可能跟随光标，我们可以通过交互或固定比例来控制
 }

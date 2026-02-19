@@ -1,0 +1,8 @@
+#!/bin/bash
+# $1 是由 qutebrowser 传入的临时文件路径
+# 我们告诉 nnn 把选中的路径写入这个临时文件
+
+# 使用你常用的终端模拟器（以 alacritty 为例）
+# -p - 是 nnn 的参数，表示将选中路径输出到 stdout 
+# 然后重定向到 qutebrowser 提供的临时文件 $1
+kitty --class "nnn-picker" -e sh -c "nnn -p - > \"$1\""

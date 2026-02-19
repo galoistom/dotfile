@@ -4,6 +4,10 @@ configuration {
     show-icons:      true;
     display-drun:    "";
     disable-history: false;
+	modi: "window,drun,run,ssh,recursivebrowser,filebrowser,combi";
+	combi-modi: "drun,recursivebrowser";
+    display-drun: "a";
+    display-recursivebrowser: "f";
 }
 
 * {
