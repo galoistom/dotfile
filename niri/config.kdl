@@ -90,10 +90,8 @@ binds {
     Alt+Shift+H { move-column-left; }
     Alt+Shift+L { move-column-right; }
     Mod+Alt+L {spawn "hyprlock"; }
-    Alt+Shift+J     { move-window-down; }
-    Alt+Shift+K     { move-window-up; }
-    Mod+Comma  { consume-window-into-column; }
-    Mod+Period { expel-window-from-column; }
+    Alt+Shift+J     { move-window-to-workspace-down; }
+    Alt+Shift+K     { move-window-to-workspace-up; }
  
     // 窗口尺寸 (对应你的 resizeactive)
     Mod+H  { set-column-width "-5%"; }
@@ -112,6 +110,8 @@ binds {
     Mod+n { consume-or-expel-window-right; }
     Alt+Shift+U { move-window-to-workspace "magic"; }
     Alt+U { focus-workspace "magic"; }
+    Mod+V { spawn "kitty" "--title" "tui-float" "nmtui"; }
+    Mod+B { spawn "kitty" "--title" "tui-float" "bluetui"; }
 
     // 截图 (Hyprshot 逻辑迁移)
     Alt+Shift+S {spawn-sh "hyprshot -m region --clipboard-only"; }
@@ -162,3 +162,10 @@ window-rule {
     // 这里的关键：强制居中
     // Niri 默认浮动窗口可能跟随光标，我们可以通过交互或固定比例来控制
 }
+
+window-rule {
+    match title="tui-float"
+
+    open-floating true
+    open-on-output "focused"
+ }
