@@ -520,6 +520,7 @@ c.fonts.tabs.unselected = 'CascadiaMono'
 # 按 'td' (Toggle Dark) 切换强制暗黑模式
 config.bind('td', 'config-cycle colors.webpage.darkmode.enabled true false')
 config.bind('gp', 'open -p')
+config.bind(',p', 'spawn --userscript qute-keepassxc --key E83D089481836EBF')
 c.colors.webpage.darkmode.enabled = True
 c.colors.webpage.preferred_color_scheme = 'dark'
 # 不反转图片颜色
@@ -538,3 +539,36 @@ config.set('fileselect.handler', 'external')
 c.fileselect.single_file.command = ['sh', '/home/galoistom/.config/qutebrowser/nnn-picker.sh', '{}']
 c.fileselect.multiple_files.command = ['sh', '/home/galoistom/.config/qutebrowser/nnn-picker.sh', '{}']
 c.fileselect.folder.command = ['sh', '/home/galoistom/.config/qutebrowser/nnn-picker.sh', '{}']
+# 允许本地内容访问本地文件 URL
+config.set('content.local_content_can_access_file_urls', True)
+
+# 建议同时开启这个，以便加载远程的 MathJax 脚本
+config.set('content.local_content_can_access_remote_urls', True)
+
+c.url.searchengines = {
+    'DEFAULT': 'https://duckduckgo.com/?q={}',
+    # 使用 !y 或 y 调用 Yandex 搜索
+    'y':       'https://yandex.com/search/?text={}',
+    # 如果你也喜欢 Yandex 的图片搜索，可以加一个 yi
+    'yi':      'https://yandex.com/images/search?text={}',
+}
+c.content.blocking.enabled = True
+c.content.blocking.method = 'adblock' # uncomment this if you install python-adblock
+c.content.blocking.adblock.lists = [
+         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/legacy.txt",
+         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/filters.txt",
+         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/filters-2020.txt",
+         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/filters-2021.txt",
+         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/filters-2022.txt",
+         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/filters-2023.txt",
+         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/filters-2024.txt",
+         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/badware.txt",
+         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/privacy.txt",
+         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/badlists.txt",
+         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/annoyances.txt",
+         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/annoyances-cookies.txt",
+         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/annoyances-others.txt",
+         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/badlists.txt",
+         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/quick-fixes.txt",
+         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/resource-abuse.txt",
+         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/unbreak.txt"]

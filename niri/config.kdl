@@ -1,5 +1,6 @@
 spawn-at-startup "xwayland-satellite" // 启动你关心的 X11 支持
 spawn-at-startup "waybar"
+spawn-at-startup "dms"
 spawn-at-startup "mako"
 spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 spawn-at-startup "emacs" "--daemon"
@@ -28,7 +29,7 @@ xcursor-size 15
 }
 
 layout {
-       gaps 5
+       gaps 10
        focus-ring {
        		  width 2
 		  active-color "#bd93f9ff"
