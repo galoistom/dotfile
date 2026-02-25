@@ -93,6 +93,7 @@ binds {
     Alt+Shift+H { move-column-left; }
     Alt+Shift+L { move-column-right; }
     Mod+Alt+L {spawn "hyprlock"; }
+    Mod+Alt+S {spawn "systemctl" "suspend"; }
     Alt+Shift+J     { move-window-to-workspace-down; }
     Alt+Shift+K     { move-window-to-workspace-up; }
  
