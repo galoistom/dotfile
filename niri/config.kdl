@@ -1,4 +1,6 @@
 spawn-at-startup "xwayland-satellite" // 启动你关心的 X11 支持
+spawn-at-startup "xsettingsd"
+spawn-at-startup "xrdb" "-merge" "/home/galoistom/.Xresources"
 spawn-at-startup "waybar"
 spawn-at-startup "dms"
 spawn-at-startup "mako"
