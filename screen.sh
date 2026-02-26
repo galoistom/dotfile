@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# 检查外屏 DP-2 是否连接且处于 active 状态
+if niri msg outputs | grep -q "DP-2"; then
+    # 如果外屏在，我们检查内屏当前是否开启
+    if niri msg outputs | grep -A 5 "eDP-1" | grep -q "disabled"; then
+        # 如果内屏是禁用的，就开启它
+        niri msg output eDP-1 on
+        notify-send "显示器设置" "内屏已开启 (扩展模式)" --icon=video-display
+    else
+        # 如果内屏是开启的，就禁用它
+        niri msg output eDP-1 off
+        notify-send "显示器设置" "内屏已禁用 (仅外屏模式)" --icon=video-display
+    fi
+else
+    # 如果没接外屏，强制开启内屏以防黑屏
+    niri msg output eDP-1 on
+    notify-send "显示器设置" "未检测到外屏，已恢复内屏" --icon=dialog-warning
+fi

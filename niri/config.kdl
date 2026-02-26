@@ -30,6 +30,14 @@ xcursor-theme "Bibata-Modern-Classic"
 xcursor-size 15
 }
 
+output "DP-2" {
+       mode "2560x1440@165.000"
+       focus-at-startup
+}
+output "eDP-1" {
+    variable-refresh-rate
+}
+
 layout {
        gaps 10
        focus-ring {

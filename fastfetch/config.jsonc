@@ -117,6 +117,12 @@
       //"outputColor": "#b2ccc1"
     },
 	{
+      "type": "uptime",
+      "key": " ├ 󰅐  UPT ",
+      "keyColor": "#cee9dd",
+      //"outputColor": "#b2ccc1"
+    },
+	{
       "type": "localip",
       "key": " ├   INT ",
       "keyColor": "#cee9dd",
