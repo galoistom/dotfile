@@ -23,6 +23,9 @@ input {
     }
     focus-follows-mouse max-scroll-amount="0%"
     warp-mouse-to-focus
+    touch {
+    off
+    }
 }
 
 cursor{
@@ -35,7 +38,7 @@ output "DP-2" {
        focus-at-startup
 }
 output "eDP-1" {
-    variable-refresh-rate
+    variable-refresh-rate on-demand=true
 }
 
 layout {
@@ -79,7 +82,7 @@ binds {
     Alt+Shift+E { quit; }
     Alt+D { spawn "rofi" "-show" "combi"; }
     Alt+Control+R { spawn-sh "rofi -show power-menu -modi power-menu:rofi-power-menu"; }
-    Mod+Shift+Slash { show-hotkey-overlay; }
+    Mod+Alt+H { show-hotkey-overlay; }
 
     // 应用快捷键
     Alt+N { spawn "kitty" "-e" "zsh" "-i" "-c" "nnn"; }
@@ -118,12 +121,16 @@ binds {
     Mod+C { center-window; }
     Mod+O { toggle-overview; }
     Mod+T {toggle-column-tabbed-display; }
-    Mod+m  { consume-or-expel-window-left; }
-    Mod+n { consume-or-expel-window-right; }
+    Mod+n  { consume-or-expel-window-left; }
+    Mod+m { consume-or-expel-window-right; }
     Alt+Shift+U { move-window-to-workspace "magic"; }
     Alt+U { focus-workspace "magic"; }
     Mod+V { spawn "kitty" "--title" "tui-float" "nmtui"; }
     Mod+B { spawn "kitty" "--title" "tui-float" "bluetui"; }
+    Mod+Ctrl+H     { move-column-left; }
+    Mod+Ctrl+J     { move-window-down; }
+    Mod+Ctrl+K     { move-window-up; }
+    Mod+Ctrl+L     { move-column-right; }
 
     // 截图 (Hyprshot 逻辑迁移)
     Alt+Shift+S {spawn-sh "hyprshot -m region --clipboard-only"; }

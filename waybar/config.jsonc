@@ -1,6 +1,6 @@
 {
   "layer": "bottom",
-  "position": "top",
+  "position": "bottom",
   "height": 10,
   "spacing": 2,
   "exclusive": true,
