@@ -39,7 +39,7 @@
   },
   "clock#simpleclock": {
     "tooltip": false,
-    "format": " {:%H:%M}",
+    "format": " {:%H:%M  %d}",
     "format-alt": " {:%Y-%m-%d %H:%M:%S}",
   },
   "clock": {

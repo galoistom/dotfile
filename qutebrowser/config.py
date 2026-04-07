@@ -10,17 +10,17 @@
 #   qute://help/configuring.html
 #   qute://help/settings.html
 
-import dracula.draw
-
-# Load existing settings made via :set
-
-dracula.draw.blood(c, {
-    'spacing': {
-        'vertical': 6,
-        'horizontal': 8
-    }
-})
-
+#import dracula.draw
+#
+## Load existing settings made via :set
+#
+#dracula.draw.blood(c, {
+#    'spacing': {
+#        'vertical': 6,
+#        'horizontal': 8
+#    }
+#})
+#
 # Change the argument to True to still load settings configured via autoconfig.yml
 config.load_autoconfig(False)
 
@@ -524,13 +524,12 @@ c.fonts.tabs.unselected = 'CascadiaMono'
 config.bind('td', 'config-cycle colors.webpage.darkmode.enabled true false')
 config.bind('gp', 'open -p')
 config.bind(',p', 'spawn --userscript qute-keepassxc --key E83D089481836EBF')
-c.colors.webpage.darkmode.enabled = True
-c.colors.webpage.preferred_color_scheme = 'dark'
+c.colors.webpage.darkmode.enabled = False
 # 不反转图片颜色
 c.colors.webpage.darkmode.policy.images = 'never'
 
 # 另外，建议开启以下设置以获得更好的对比度效果
-c.colors.webpage.darkmode.threshold.background = 205  # 只有亮度高于此值的背景才会被变黑
+#c.colors.webpage.darkmode.threshold.background = 205  # 只有亮度高于此值的背景才会被变黑
 #c.colors.webpage.darkmode.threshold.text = 150        # 只有亮度低于此值的文字才会被变亮
 c.content.pdfjs = True
 
@@ -557,21 +556,24 @@ c.url.searchengines = {
 }
 c.content.blocking.enabled = True
 c.content.blocking.method = 'adblock' # uncomment this if you install python-adblock
+#c.qt.args = ["--enable-gpu-rasterization"]
+c.auto_save.session = False
+c.content.autoplay = False
+c.content.cache.size = 50 * 1024 * 1024
 c.content.blocking.adblock.lists = [
-         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/legacy.txt",
+#         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/legacy.txt",
          "https://github.com/uBlockOrigin/uAssets/raw/master/filters/filters.txt",
-         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/filters-2020.txt",
-         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/filters-2021.txt",
-         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/filters-2022.txt",
-         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/filters-2023.txt",
-         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/filters-2024.txt",
+#         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/filters-2020.txt",
+#         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/filters-2021.txt",
+#         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/filters-2022.txt",
+#         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/filters-2023.txt",
+#         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/filters-2024.txt",
          "https://github.com/uBlockOrigin/uAssets/raw/master/filters/badware.txt",
          "https://github.com/uBlockOrigin/uAssets/raw/master/filters/privacy.txt",
-         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/badlists.txt",
-         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/annoyances.txt",
-         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/annoyances-cookies.txt",
-         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/annoyances-others.txt",
-         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/badlists.txt",
+#         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/badlists.txt",
+#         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/annoyances.txt",
+#         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/annoyances-cookies.txt",
+#         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/annoyances-others.txt",
          "https://github.com/uBlockOrigin/uAssets/raw/master/filters/quick-fixes.txt",
-         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/resource-abuse.txt",
+#         "https://github.com/uBlockOrigin/uAssets/raw/master/filters/resource-abuse.txt",
          "https://github.com/uBlockOrigin/uAssets/raw/master/filters/unbreak.txt"]
