@@ -1,0 +1,2 @@
+#/bin/bash
+sudo openconnect --protocol=pulse https://vpn.pku.edu.cn -u 2400010768 --no-dtls
