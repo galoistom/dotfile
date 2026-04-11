@@ -1,0 +1,6 @@
+[submodule "nvim-config"]
+	path = nvim-config
+	url = https://github.com/galoistom/nvim-config.git
+[submodule "emacs-config"]
+	path = emacs-config
+	url = https://github.com/galoistom/emacs-config.git
