@@ -4,6 +4,7 @@ spawn-at-startup "xrdb" "-merge" "/home/galoistom/.Xresources"
 spawn-at-startup "waybar"
 spawn-at-startup "dms"
 spawn-at-startup "mako"
+spawn-at-startup "wl-paste" "--watch" "cliphist" "store"
 spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 spawn-at-startup "emacs" "--daemon"
 spawn-at-startup "wl-clip-persist" "--clipboard" "regular"
@@ -22,7 +23,6 @@ input {
 	click-method  "clickfinger"
     }
     focus-follows-mouse max-scroll-amount="0%"
-//    warp-mouse-to-focus
     touch {
     off
     }
@@ -92,7 +92,8 @@ binds {
     Alt+Shift+F { spawn "zen-browser"; }
     Alt+Shift+P { spawn "zen-browser" "--private-window"; }
     Alt+M { spawn "emacsclient" "-c"; }
-	Alt+Shift+M {spawn "emacs" "--daemon"; }
+    Alt+Control+K { spawn "emskin"; }
+    Alt+Shift+M {spawn "emacs" "--daemon"; }
 
     // 焦点切换 (Vim keys)
     Alt+H { focus-column-left; }
@@ -125,6 +126,7 @@ binds {
     Mod+Alt+n  { consume-or-expel-window-left; }
     Mod+Alt+m { consume-or-expel-window-right; }
     Mod+V { spawn "kitty" "--title" "tui-float" "nmtui"; }
+    Alt+Control+V { spawn "kitty" "--single-instance"  "--title" "tui-float" "-e" "cliphist-tui"; }
     Mod+B { spawn "kitty" "--title" "tui-float" "bluetui"; }
     Mod+Ctrl+H     { move-column-left; }
     Mod+Ctrl+J     { move-window-down; }
@@ -132,8 +134,9 @@ binds {
     Mod+Ctrl+L     { move-column-right; }
 
     // 截图 (Hyprshot 逻辑迁移)
-    Alt+Shift+S {spawn-sh "hyprshot -m region --clipboard-only"; }
-    Alt+Ctrl+E {spawn "toggle-screen";}
+    // {spawn-sh "hyprshot -m region --clipboard-only"; }
+    Alt+Shift+S { screenshot; }
+    Alt+Ctrl+E {spawn "togglescreen";}
 
     // 工作区切换 (Workspace -> Niri 的 Workspace 是垂直排列的)
 //    Alt+1 { focus-workspace 1; }
