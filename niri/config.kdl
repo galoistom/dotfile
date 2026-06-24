@@ -9,6 +9,7 @@ spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 spawn-at-startup "emacs" "--daemon"
 spawn-at-startup "wl-clip-persist" "--clipboard" "regular"
 spawn-at-startup "swaybg" "-m" "fill" "-i" "/home/galoistom/Pictures/12-Dark.jpg"
+//XDG_MENU_PREFIX "arch-"
 //spawn-at-startup "swaybg" "-m" "fill" "-i" "/home/galoistom/Pictures/20260406212754(32).png"
 //spawn-at-startup "dbus-update-activation-environment" "--systemd" "WAYLAND_DISPLAY" "XDG_CURRENT_DESKTOP" "NIRI_SOCKET"
 //spawn-at-startup "localsend"
@@ -87,7 +88,7 @@ binds {
 
     // 应用快捷键
     Alt+N { spawn "kitty" "-e" "zsh" "-i" "-c" "nnn"; }
-    Alt+O { spawn "sh" "-c" "OBSIDIAN_USE_WAYLAND=1 obsidian --enable-features=UseOzonePlatform --ozone-platform=wayland"; }
+    //Alt+O { spawn "sh" "-c" "OBSIDIAN_USE_WAYLAND=1 obsidian --enable-features=UseOzonePlatform --ozone-platform=wayland"; }
     Alt+I { spawn "qutebrowser"; }
     Alt+Shift+F { spawn "zen-browser"; }
     Alt+Shift+P { spawn "zen-browser" "--private-window"; }
@@ -105,10 +106,10 @@ binds {
     // 移动窗口
     Alt+Shift+H { move-column-left; }
     Alt+Shift+L { move-column-right; }
-    Mod+Alt+L {spawn "hyprlock"; }
-    Mod+Alt+S {spawn "systemctl" "suspend"; }
     Alt+Shift+J     { move-window-to-workspace-down; }
     Alt+Shift+K     { move-window-to-workspace-up; }
+    Mod+Alt+L {spawn "hyprlock"; }
+    Mod+Alt+S {spawn "systemctl" "suspend"; }
  
     // 窗口尺寸 (对应你的 resizeactive)
     Mod+H  { set-column-width "-5%"; }
@@ -121,17 +122,17 @@ binds {
     Mod+W { fullscreen-window; }
     Mod+Space { toggle-window-floating; }
     Mod+C { center-window; }
-    Mod+O { toggle-overview; }
+    Mod+Alt+O { toggle-overview; }
     Mod+T {toggle-column-tabbed-display; }
     Mod+Alt+n  { consume-or-expel-window-left; }
     Mod+Alt+m { consume-or-expel-window-right; }
     Mod+V { spawn "kitty" "--title" "tui-float" "nmtui"; }
     Alt+Control+V { spawn "kitty" "--single-instance"  "--title" "tui-float" "-e" "cliphist-tui"; }
     Mod+B { spawn "kitty" "--title" "tui-float" "bluetui"; }
-    Mod+Ctrl+H     { move-column-left; }
-    Mod+Ctrl+J     { move-window-down; }
-    Mod+Ctrl+K     { move-window-up; }
-    Mod+Ctrl+L     { move-column-right; }
+//    Mod+Ctrl+H     { move-column-left; }
+//    Mod+Ctrl+J     { move-window-down; }
+//    Mod+Ctrl+K     { move-window-up; }
+//    Mod+Ctrl+L     { move-column-right; }
 
     // 截图 (Hyprshot 逻辑迁移)
     // {spawn-sh "hyprshot -m region --clipboard-only"; }

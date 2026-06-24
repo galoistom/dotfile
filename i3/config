@@ -115,10 +115,10 @@ bindsym $mod+Shift+l move right
 bindsym $mod+t split h
 
 # split in vertical orientation
-bindsym $mod+b split v
+bindsym Mod4+b split v
 
 # enter fullscreen mode for the focused container
-bindsym $mod+f fullscreen toggle
+bindsym $mod+a fullscreen toggle
 
 # change container layout (stacked, tabbed, toggle split)
 bindsym $mod+s layout stacking
@@ -132,7 +132,7 @@ bindsym $mod+Control+Tab floating toggle
 bindsym $mod+Tab focus mode_toggle
 
 # focus the parent container
-bindsym $mod+a focus parent
+bindsym $mod+Control+a focus parent
 
 # focus the child container
 #bindsym $mod+d focus child

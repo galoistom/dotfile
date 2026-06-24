@@ -26,6 +26,7 @@
   },
   "niri/window": {
       "format": "{title}",
+//      "on-click": "rofi -show window",
       "separate-outputs": true,
       "icon": true,
       "icon-size": 18
