@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+
+# nnn 插件：将选中文件复制到 U 盘（/dev/sda1）的指定路径
+# 固定挂载点：/media/sda1（需要 sudo 权限）
+
+DEVICE="/dev/sda1"
+MOUNT_POINT="/media/sda1"
+
+# 1. 检查 U 盘是否存在
+if [ ! -b "$DEVICE" ]; then
+    echo "错误：设备 $DEVICE 不存在，请插入 U 盘。"
+    read -p "按 Enter 退出..."
+    exit 1
+fi
+
+# 2. 确保挂载点目录存在，并挂载
+if mountpoint -q "$MOUNT_POINT" 2>/dev/null; then
+    echo "U 盘已挂载到 $MOUNT_POINT"
+else
+    echo "正在准备挂载到 $MOUNT_POINT ..."
+    # 如果目录不存在则创建（需要 sudo）
+    if [ ! -d "$MOUNT_POINT" ]; then
+        sudo mkdir -p "$MOUNT_POINT" || {
+            echo "创建目录失败，请检查权限。"
+            read -p "按 Enter 退出..."
+            exit 1
+        }
+    fi
+    # 执行挂载
+    sudo mount "$DEVICE" "$MOUNT_POINT" || {
+        echo "挂载失败，请手动挂载：sudo mount $DEVICE $MOUNT_POINT"
+        read -p "按 Enter 退出..."
+        exit 1
+    }
+    echo "挂载成功！"
+fi
+
+# 3. 输入目标相对路径（直接回车则复制到根目录）
+echo "请输入目标相对路径（如 Documents，留空则复制到根目录）："
+read -r target_path
+target_path=$(echo "$target_path" | sed 's:^/::;s:/*$::')  # 去除首尾斜杠
+
+# 4. 检查是否选中文件
+if [ $# -eq 0 ]; then
+    echo "未选中任何文件，请在 nnn 中选择文件后再运行。"
+    read -p "按 Enter 退出..."
+    exit 1
+fi
+
+# 5. 创建目标目录并复制文件
+dest_dir="$MOUNT_POINT/$target_path"
+mkdir -p "$dest_dir" || {
+    echo "无法创建目录 $dest_dir"
+    read -p "按 Enter 退出..."
+    exit 1
+}
+
+echo "开始复制到 $dest_dir ..."
+for file in "$@"; do
+    if [ ! -e "$file" ]; then
+        echo "警告：$file 不存在，跳过。"
+        continue
+    fi
+    cp -p "$file" "$dest_dir/" && echo "  $(basename "$file") 已复制"
+done
+
+echo "全部完成！"
+read -p "按 Enter 继续..."

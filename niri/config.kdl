@@ -1,3 +1,4 @@
+//-*- mode: text; comment-start: "// "; comment-end: "" -*-
 spawn-at-startup "xwayland-satellite" // 启动你关心的 X11 支持
 spawn-at-startup "xsettingsd"
 spawn-at-startup "xrdb" "-merge" "/home/galoistom/.Xresources"
@@ -6,12 +7,13 @@ spawn-at-startup "dms"
 spawn-at-startup "mako"
 spawn-at-startup "wl-paste" "--watch" "cliphist" "store"
 spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
-spawn-at-startup "emacs" "--daemon"
+//spawn-at-startup "emacs" "--daemon"
 spawn-at-startup "wl-clip-persist" "--clipboard" "regular"
 spawn-at-startup "swaybg" "-m" "fill" "-i" "/home/galoistom/Pictures/12-Dark.jpg"
-//XDG_MENU_PREFIX "arch-"
 //spawn-at-startup "swaybg" "-m" "fill" "-i" "/home/galoistom/Pictures/20260406212754(32).png"
-//spawn-at-startup "dbus-update-activation-environment" "--systemd" "WAYLAND_DISPLAY" "XDG_CURRENT_DESKTOP" "NIRI_SOCKET"
+//XDG_MENU_PREFIX "arch-"
+spawn-at-startup "systemctl" "--user" "import-environment" "WAYLAND_DISPLAY" "DBUS_SESSION_BUS_ADDRESS" "XDG_CURRENT_DESKTOP"
+spawn-at-startup "systemctl" "--user" "start" "emacs.service"
 //spawn-at-startup "localsend"
 prefer-no-csd
 
@@ -94,7 +96,7 @@ binds {
     Alt+Shift+P { spawn "zen-browser" "--private-window"; }
     Alt+M { spawn "emacsclient" "-c"; }
     Alt+Control+K { spawn "emskin"; }
-    Alt+Shift+M {spawn "emacs" "--daemon"; }
+    Alt+Shift+M {spawn "systemctl" "--user" "start" "emacs.service"; }
 
     // 焦点切换 (Vim keys)
     Alt+H { focus-column-left; }
@@ -192,3 +194,16 @@ window-rule {
     open-floating true
     open-on-output "focused"
  }
+
+animations{
+        off
+}
+
+switch-events {
+    lid-close {
+        spawn "sh" "-c" "hyprlock & sleep 0.5 && systemctl suspend"
+    }
+    lid-open {
+        spawn "notify-send" "lid open"
+    }
+}
