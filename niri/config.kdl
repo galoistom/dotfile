@@ -131,6 +131,7 @@ binds {
     Mod+V { spawn "kitty" "--title" "tui-float" "nmtui"; }
     Alt+Control+V { spawn "kitty" "--single-instance"  "--title" "tui-float" "-e" "cliphist-tui"; }
     Mod+B { spawn "kitty" "--title" "tui-float" "bluetui"; }
+    Alt+U { spawn "kitty" "--title" "tui-float" "rmpc"; }
 //    Mod+Ctrl+H     { move-column-left; }
 //    Mod+Ctrl+J     { move-window-down; }
 //    Mod+Ctrl+K     { move-window-up; }
@@ -200,10 +201,7 @@ animations{
 }
 
 switch-events {
-    lid-close {
-        spawn "sh" "-c" "hyprlock & sleep 0.5 && systemctl suspend"
-    }
     lid-open {
-        spawn "notify-send" "lid open"
+             spawn "sh" "-c" "hyprlock"
     }
 }

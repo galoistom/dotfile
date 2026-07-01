@@ -5,9 +5,6 @@
 (setq inhibit-startup-screen t)
 (setq select-enable-clipboard t)
 (setq select-enable-primary t)
-(menu-bar-mode -1)
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
 (display-time-mode t)
 (window-divider-mode t)
 (electric-pair-mode 1)
@@ -51,7 +48,6 @@
 (global-set-key (kbd "C-c w b") #'balance-windows)
 (global-set-key (kbd "C-c w m") #'maximize-window)
 (global-set-key (kbd "C-c w ,") #'minimize-window)
-(global-set-key (kbd "C-c w n") #'ivy-switch-buffer)
 (global-set-key (kbd "C-c w o") #'other-window)
 
 (global-set-key (kbd "C-.")          #'duplicate-line)
