@@ -1,5 +1,6 @@
 //-*- mode: text; comment-start: "// "; comment-end: "" -*-
-spawn-at-startup "xwayland-satellite" // 启动你关心的 X11 支持
+
+spawn-at-startup "xwayland-satellite"
 spawn-at-startup "xsettingsd"
 spawn-at-startup "xrdb" "-merge" "/home/galoistom/.Xresources"
 spawn-at-startup "waybar"
@@ -7,14 +8,16 @@ spawn-at-startup "dms"
 spawn-at-startup "mako"
 spawn-at-startup "wl-paste" "--watch" "cliphist" "store"
 spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
-//spawn-at-startup "emacs" "--daemon"
 spawn-at-startup "wl-clip-persist" "--clipboard" "regular"
 spawn-at-startup "swaybg" "-m" "fill" "-i" "/home/galoistom/Pictures/12-Dark.jpg"
-//spawn-at-startup "swaybg" "-m" "fill" "-i" "/home/galoistom/Pictures/20260406212754(32).png"
-//XDG_MENU_PREFIX "arch-"
 spawn-at-startup "systemctl" "--user" "import-environment" "WAYLAND_DISPLAY" "DBUS_SESSION_BUS_ADDRESS" "XDG_CURRENT_DESKTOP"
 spawn-at-startup "systemctl" "--user" "start" "emacs.service"
+
+//spawn-at-startup "swaybg" "-m" "fill" "-i" "/home/galoistom/Pictures/20260406212754(32).png"
+//spawn-at-startup "emacs" "--daemon"
 //spawn-at-startup "localsend"
+//XDG_MENU_PREFIX "arch-"
+
 prefer-no-csd
 
 input {
@@ -42,7 +45,6 @@ output "DP-2" {
 }
 output "eDP-1" {
     variable-refresh-rate on-demand=true
-//    variable-refresh-rate
 }
 
 layout {
@@ -80,121 +82,83 @@ recent-windows {
 }
 
 binds {
-    // 基础操作
-    Alt+Return { spawn "kitty"; }
-    Alt+Q { close-window; }
-    Alt+Shift+E { quit; }
-    Alt+D { spawn "rofi" "-show" "combi"; }
-    Alt+Control+R { spawn-sh "rofi -show power-menu -modi power-menu:rofi-power-menu"; }
-    Mod+Alt+H { show-hotkey-overlay; }
+    Alt+Return    { spawn                     "kitty"; }
+    Alt+Q         { close-window;             }
+    Alt+Shift+E   { quit;                     }
+    Alt+D         hotkey-overlay-title="rofi" { spawn  "rofi"  "-show"      "combi"; }
+    Alt+Control+R { spawn                     "rofi"   "-show" "power-menu" "-modi"  "power-menu:rofi-power-menu"; }
+    Mod+Alt+H     { show-hotkey-overlay;      }
+   
+    Alt+N         { spawn "kitty"        "-e"                "zsh"   "-i"             "-c" "nnn"; }
+    Alt+I         { spawn "qutebrowser"; }
+    Alt+Shift+F   { spawn "zen-browser"; }
+    Alt+Shift+P   { spawn "zen-browser"  "--private-window"; }
+    Alt+M         { spawn "emacsclient"  "-c";               }
+    Alt+Control+K { spawn "emskin";      }
+    Alt+Shift+M   {spawn  "systemctl"    "--user"            "start" "emacs.service"; }
 
-    // 应用快捷键
-    Alt+N { spawn "kitty" "-e" "zsh" "-i" "-c" "nnn"; }
-    //Alt+O { spawn "sh" "-c" "OBSIDIAN_USE_WAYLAND=1 obsidian --enable-features=UseOzonePlatform --ozone-platform=wayland"; }
-    Alt+I { spawn "qutebrowser"; }
-    Alt+Shift+F { spawn "zen-browser"; }
-    Alt+Shift+P { spawn "zen-browser" "--private-window"; }
-    Alt+M { spawn "emacsclient" "-c"; }
-    Alt+Control+K { spawn "emskin"; }
-    Alt+Shift+M {spawn "systemctl" "--user" "start" "emacs.service"; }
+    Mod+V       hotkey-overlay-title="network"   { spawn "kitty" "--title" "tui-float" "nmtui";   }
+    Mod+B       hotkey-overlay-title="bluetooth" { spawn "kitty" "--title" "tui-float" "bluetui"; }
+    Alt+U       hotkey-overlay-title="music"     { spawn "kitty" "--title" "tui-float" "rmpc";    }
 
-    // 焦点切换 (Vim keys)
-    Alt+H { focus-column-left; }
-    Alt+L { focus-column-right; }
-    Alt+J { focus-window-or-workspace-down; }
-    Alt+K { focus-window-or-workspace-up; }
-    Mod+F { spawn "rofi" "-show" "window"; }
+    Alt+H    { focus-column-left;              }
+    Alt+L    { focus-column-right;             }
+    Alt+J    { focus-window-or-workspace-down; }
+    Alt+K    { focus-window-or-workspace-up;   }
+    Mod+F    hotkey-overlay-title="switch      window" { spawn "rofi" "-show" "window"; }
     
-    // 移动窗口
-    Alt+Shift+H { move-column-left; }
-    Alt+Shift+L { move-column-right; }
-    Alt+Shift+J     { move-window-to-workspace-down; }
-    Alt+Shift+K     { move-window-to-workspace-up; }
-    Mod+Alt+L {spawn "hyprlock"; }
-    Mod+Alt+S {spawn "systemctl" "suspend"; }
- 
-    // 窗口尺寸 (对应你的 resizeactive)
-    Mod+H  { set-column-width "-5%"; }
-    Mod+L { set-column-width "+5%"; }
+    Alt+Shift+H { move-column-left;              }
+    Alt+Shift+L { move-column-right;             }
+    Alt+Shift+J { move-window-to-workspace-down; }
+    Alt+Shift+K { move-window-to-workspace-up;   }
+    Mod+Alt+L   {spawn                           "hyprlock"; }
+    Mod+Alt+S   hotkey-overlay-title="suspend"   {spawn      "systemctl" "suspend"; }
+    Mod+Alt+J   { focus-workspace-down;}
+    Mod+Alt+K   { focus-workspace-up;}
+    
+    Mod+H    { set-column-width  "-5%"; }
+    Mod+L    { set-column-width  "+5%"; }
     Mod+K    { set-window-height "-5%"; }
-    Mod+J  { set-window-height "+5%"; }
+    Mod+J    { set-window-height "+5%"; }
     
-    // 全屏与缩放 (Niri 没有伪平铺，但有内容伸缩)
-    Alt+A { maximize-column; }
-    Mod+W { fullscreen-window; }
-    Mod+Space { toggle-window-floating; }
-    Mod+C { center-window; }
-    Mod+Alt+O { toggle-overview; }
-    Mod+T {toggle-column-tabbed-display; }
-    Mod+Alt+n  { consume-or-expel-window-left; }
-    Mod+Alt+m { consume-or-expel-window-right; }
-    Mod+V { spawn "kitty" "--title" "tui-float" "nmtui"; }
-    Alt+Control+V { spawn "kitty" "--single-instance"  "--title" "tui-float" "-e" "cliphist-tui"; }
-    Mod+B { spawn "kitty" "--title" "tui-float" "bluetui"; }
-    Alt+U { spawn "kitty" "--title" "tui-float" "rmpc"; }
-//    Mod+Ctrl+H     { move-column-left; }
-//    Mod+Ctrl+J     { move-window-down; }
-//    Mod+Ctrl+K     { move-window-up; }
-//    Mod+Ctrl+L     { move-column-right; }
+    Alt+A         { maximize-column;               }
+    Mod+W         { fullscreen-window;             }
+    Mod+Space     { toggle-window-floating;        }
+    Mod+C         { center-window;                 }
+    Mod+Alt+O     { toggle-overview;               }
+    Mod+T         {toggle-column-tabbed-display;   }
+    Mod+Alt+n     { consume-or-expel-window-left;  }
+    Mod+Alt+m     { consume-or-expel-window-right; }
+    Alt+Control+V hotkey-overlay-title="clipboard" { spawn "kitty" "--single-instance" "--title" "tui-float" "-e" "cliphist-tui"; }
 
-    // 截图 (Hyprshot 逻辑迁移)
-    // {spawn-sh "hyprshot -m region --clipboard-only"; }
     Alt+Shift+S { screenshot; }
-    Alt+Ctrl+E {spawn "togglescreen";}
+    Alt+Ctrl+E  {spawn        "togglescreen";}
 
-    // 工作区切换 (Workspace -> Niri 的 Workspace 是垂直排列的)
-//    Alt+1 { focus-workspace 1; }
-//    Alt+2 { focus-workspace 2; }
-//    Alt+3 { focus-workspace 3; }
-//    Alt+4 { focus-workspace 4; }
-//    Alt+5 { focus-workspace 5; }
-//    Alt+6 { focus-workspace 6; }
-//    Alt+7 { focus-workspace 7; }
-//    Alt+8 { focus-workspace 8; }
-//    // ...以此类推到 0
-
-//    Alt+Shift+1 { move-column-to-workspace 1; }
-//    Alt+Shift+2 { move-column-to-workspace 2; }
-//    Alt+Shift+3 { move-column-to-workspace 3; }
-//    Alt+Shift+4 { move-column-to-workspace 4; }
-//    Alt+Shift+5 { move-column-to-workspace 5; }
-//    Alt+Shift+6 { move-column-to-workspace 6; }
-//    Alt+Shift+7 { move-column-to-workspace 7; }
-//    Alt+Shift+8 { move-column-to-workspace 8; }
-    // ...以此类推
-
-    // 笔记本多媒体键
-    XF86AudioRaiseVolume { spawn "wpctl" "set-volume" "-l" "1" "@DEFAULT_AUDIO_SINK@" "5%+"; }
-    XF86AudioLowerVolume { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
-    XF86AudioMute        { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
-    XF86MonBrightnessUp   { spawn "brightnessctl" "set" "5%+"; }
-    XF86MonBrightnessDown { spawn "brightnessctl" "set" "5%-"; }
+    XF86AudioRaiseVolume  { spawn "wpctl"         "set-volume" "-l"                   "1"       "@DEFAULT_AUDIO_SINK@" "5%+"; }
+    XF86AudioLowerVolume  { spawn "wpctl"         "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-";    }
+    XF86AudioMute         { spawn "wpctl"         "set-mute"   "@DEFAULT_AUDIO_SINK@" "toggle"; }
+    XF86MonBrightnessUp   { spawn "brightnessctl" "set"        "5%+";                 }
+    XF86MonBrightnessDown { spawn "brightnessctl" "set"        "5%-";                 }
 }
 
 window-rule {
-    // 匹配我们在脚本里设置的 class/app-id
-    match app-id="nnn-picker"
-
-    // 开启浮动模式
-    open-floating true
-
-    // 设置初始位置为居中
-    open-on-output "focused"
-    
-    // 设置窗口大小（根据你的屏幕分辨率调整）
-    default-column-width { proportion 0.5; }
-    default-window-height { proportion 0.6; }
-
-    // 这里的关键：强制居中
-    // Niri 默认浮动窗口可能跟随光标，我们可以通过交互或固定比例来控制
+ match                 app-id="nnn-picker"
+ open-floating         true
+ open-on-output        "focused"
+ default-column-width  { proportion 0.5; }
+ default-window-height { proportion 0.6; }
 }
 
 window-rule {
-    match title="tui-float"
-
-    open-floating true
-    open-on-output "focused"
+ match          title="tui-float"
+ open-floating  true
+ open-on-output "focused"
  }
+
+window-rule {
+ match          app-id="emskin"
+ open-maximized true
+}
 
 animations{
         off
