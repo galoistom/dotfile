@@ -1,5 +1,4 @@
-//-*- mode: text; comment-start: "// "; comment-end: "" -*-
-
+//-*- mode: kdl -*-
 spawn-at-startup "xwayland-satellite"
 spawn-at-startup "xsettingsd"
 spawn-at-startup "xrdb" "-merge" "/home/galoistom/.Xresources"
@@ -21,17 +20,17 @@ spawn-at-startup "systemctl" "--user" "start" "emacs.service"
 prefer-no-csd
 
 input {
-    touchpad {
-        tap
-	accel-speed  0.5
-        dwt
-        natural-scroll
-	click-method  "clickfinger"
-    }
-    focus-follows-mouse max-scroll-amount="0%"
-    touch {
-    off
-    }
+        touchpad {
+                tap
+                accel-speed  0.5
+                dwt
+                natural-scroll
+                click-method  "clickfinger"
+        }
+        focus-follows-mouse max-scroll-amount="0%"
+        touch {
+                off
+        }
 }
 
 cursor{
@@ -40,124 +39,131 @@ xcursor-size 24
 }
 
 output "DP-2" {
-       mode "2560x1440@165.000"
-       focus-at-startup
+        mode "2560x1440@165.000"
+        focus-at-startup
 }
 output "eDP-1" {
-    variable-refresh-rate on-demand=true
+        variable-refresh-rate on-demand=true
 }
 
 layout {
-       gaps 10
-       focus-ring {
-       		  width 2
-		  active-color "#bd93f9ff"
-		  inactive-color "#595959aa"
-       }
-       empty-workspace-above-first
+        gaps 10
+        focus-ring {
+                width 2
+                active-color "#bd93f9ff"
+                inactive-color "#595959aa"
+        }
+        empty-workspace-above-first
 }
 
 recent-windows {
-    // off
-    debounce-ms 750
-
-    open-delay-ms 150
-
-    highlight {
-        active-color "#999999ff"
-        urgent-color "#ff9999ff"
-        padding 30
-        corner-radius 0
-    }
-
-    previews {
-        max-height 480
-        max-scale 0.5
-    }
-
-    binds {
-        Alt+Tab         { next-window; }
-        Alt+Shift+Tab   { previous-window; }
+        // off
+        debounce-ms 750
+        
+        open-delay-ms 150
+        
+        highlight {
+                active-color "#999999ff"
+                urgent-color "#ff9999ff"
+                padding 30
+                corner-radius 0
+        }
+        
+        previews {
+                max-height 480
+                max-scale 0.5
+        }
+        
+        binds {
+                Alt+Tab         { next-window; }
+                Alt+Shift+Tab   { previous-window; }
 	}
 }
 
 binds {
-    Alt+Return    { spawn                     "kitty"; }
-    Alt+Q         { close-window;             }
-    Alt+Shift+E   { quit;                     }
-    Alt+D         hotkey-overlay-title="rofi" { spawn  "rofi"  "-show"      "combi"; }
-    Alt+Control+R { spawn                     "rofi"   "-show" "power-menu" "-modi"  "power-menu:rofi-power-menu"; }
-    Mod+Alt+H     { show-hotkey-overlay;      }
-   
-    Alt+N         { spawn "kitty"        "-e"                "zsh"   "-i"             "-c" "nnn"; }
-    Alt+I         { spawn "qutebrowser"; }
-    Alt+Shift+F   { spawn "zen-browser"; }
-    Alt+Shift+P   { spawn "zen-browser"  "--private-window"; }
-    Alt+M         { spawn "emacsclient"  "-c";               }
-    Alt+Control+K { spawn "emskin";      }
-    Alt+Shift+M   {spawn  "systemctl"    "--user"            "start" "emacs.service"; }
+        Alt+Return    { spawn                     "kitty"; }
+        Alt+Q         { close-window;             }
+        Alt+Shift+E   { quit;                     }
+        Alt+D         hotkey-overlay-title="rofi" { spawn  "rofi"  "-show"      "combi"; }
+        Alt+Control+R { spawn                     "rofi"   "-show" "power-menu" "-modi"  "power-menu:rofi-power-menu"; }
+        Mod+Alt+H     { show-hotkey-overlay;      }
+        
+        Alt+N         { spawn "kitty"        "-e"                "zsh"   "-i"             "-c" "nnn"; }
+        Alt+I         { spawn "qutebrowser"; }
+        Alt+Shift+F   { spawn "zen-browser"; }
+        Alt+Shift+P   { spawn "zen-browser"  "--private-window"; }
+        Alt+M         { spawn "emacsclient"  "-c";               }
+        Alt+Control+K { spawn "emskin";      }
+        Alt+Shift+M   { spawn "systemctl"    "--user"            "start" "emacs.service"; }
+                
+        Alt+U      hotkey-overlay-title="music"         { spawn "kitty"     "--title" "tui-float" "rmpc";    }
+        Mod+V      hotkey-overlay-title="network"       { spawn "kitty"     "--title" "tui-float" "nmtui";   }
+        Mod+B      hotkey-overlay-title="bluetooth"     { spawn "kitty"     "--title" "tui-float" "bluetui"; }
+        Mod+F      hotkey-overlay-title="switch window" { spawn "rofi"      "-show"     "window";  }
+        Mod+Alt+L  hotkey-overlay-title="hyprlock"      { spawn "hyprlock"; }
+        Mod+Alt+S  hotkey-overlay-title="suspend"       { spawn "systemctl" "suspend"; }
+        Alt+Ctrl+V hotkey-overlay-title="clipboard"     { spawn "kitty" "--single-instance" "--title" "tui-float" "-e" "cliphist-tui"; }                
+        Alt+H    { focus-column-left;              }
+        Alt+L    { focus-column-right;             }
+        Alt+J    { focus-window-or-workspace-down; }
+        Alt+K    { focus-window-or-workspace-up;   }
+        Alt+A    { maximize-column;               }        
+        
+        Alt+Shift+H { move-column-left;              }
+        Alt+Shift+L { move-column-right;             }
+        Alt+Shift+J { move-window-to-workspace-down; }
+        Alt+Shift+K { move-window-to-workspace-up;   }
+        
+        Mod+Alt+J   { focus-workspace-down;}
+        Mod+Alt+K   { focus-workspace-up;}
+        
+        Mod+H    { set-column-width  "-5%"; }
+        Mod+L    { set-column-width  "+5%"; }
+        Mod+K    { set-window-height "-5%"; }
+        Mod+J    { set-window-height "+5%"; }
+        
+        Mod+W         { fullscreen-window;             }
+        Mod+C         { center-window;                 }
+        Mod+T         {toggle-column-tabbed-display;   }
+        Mod+Space     { toggle-window-floating;        }
+        Mod+Alt+O     { toggle-overview;               }
+        Mod+Alt+n     { consume-or-expel-window-left;  }
+        Mod+Alt+m     { consume-or-expel-window-right; }
+        
+        Alt+Shift+S { screenshot; }
+        Alt+Ctrl+E  { spawn        "togglescreen";}
 
-    Mod+V       hotkey-overlay-title="network"   { spawn "kitty" "--title" "tui-float" "nmtui";   }
-    Mod+B       hotkey-overlay-title="bluetooth" { spawn "kitty" "--title" "tui-float" "bluetui"; }
-    Alt+U       hotkey-overlay-title="music"     { spawn "kitty" "--title" "tui-float" "rmpc";    }
-
-    Alt+H    { focus-column-left;              }
-    Alt+L    { focus-column-right;             }
-    Alt+J    { focus-window-or-workspace-down; }
-    Alt+K    { focus-window-or-workspace-up;   }
-    Mod+F    hotkey-overlay-title="switch      window" { spawn "rofi" "-show" "window"; }
-    
-    Alt+Shift+H { move-column-left;              }
-    Alt+Shift+L { move-column-right;             }
-    Alt+Shift+J { move-window-to-workspace-down; }
-    Alt+Shift+K { move-window-to-workspace-up;   }
-    Mod+Alt+L   {spawn                           "hyprlock"; }
-    Mod+Alt+S   hotkey-overlay-title="suspend"   {spawn      "systemctl" "suspend"; }
-    Mod+Alt+J   { focus-workspace-down;}
-    Mod+Alt+K   { focus-workspace-up;}
-    
-    Mod+H    { set-column-width  "-5%"; }
-    Mod+L    { set-column-width  "+5%"; }
-    Mod+K    { set-window-height "-5%"; }
-    Mod+J    { set-window-height "+5%"; }
-    
-    Alt+A         { maximize-column;               }
-    Mod+W         { fullscreen-window;             }
-    Mod+Space     { toggle-window-floating;        }
-    Mod+C         { center-window;                 }
-    Mod+Alt+O     { toggle-overview;               }
-    Mod+T         {toggle-column-tabbed-display;   }
-    Mod+Alt+n     { consume-or-expel-window-left;  }
-    Mod+Alt+m     { consume-or-expel-window-right; }
-    Alt+Control+V hotkey-overlay-title="clipboard" { spawn "kitty" "--single-instance" "--title" "tui-float" "-e" "cliphist-tui"; }
-
-    Alt+Shift+S { screenshot; }
-    Alt+Ctrl+E  {spawn        "togglescreen";}
-
-    XF86AudioRaiseVolume  { spawn "wpctl"         "set-volume" "-l"                   "1"       "@DEFAULT_AUDIO_SINK@" "5%+"; }
-    XF86AudioLowerVolume  { spawn "wpctl"         "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-";    }
-    XF86AudioMute         { spawn "wpctl"         "set-mute"   "@DEFAULT_AUDIO_SINK@" "toggle"; }
-    XF86MonBrightnessUp   { spawn "brightnessctl" "set"        "5%+";                 }
-    XF86MonBrightnessDown { spawn "brightnessctl" "set"        "5%-";                 }
+        
+        XF86AudioRaiseVolume  { spawn "wpctl"         "set-volume" "-l"                   "1"       "@DEFAULT_AUDIO_SINK@" "5%+"; }
+        XF86AudioLowerVolume  { spawn "wpctl"         "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-";    }
+        XF86AudioMute         { spawn "wpctl"         "set-mute"   "@DEFAULT_AUDIO_SINK@" "toggle"; }
+        XF86MonBrightnessUp   { spawn "brightnessctl" "set"        "5%+";                 }
+        XF86MonBrightnessDown { spawn "brightnessctl" "set"        "5%-";                 }
 }
 
 window-rule {
- match                 app-id="nnn-picker"
- open-floating         true
- open-on-output        "focused"
- default-column-width  { proportion 0.5; }
- default-window-height { proportion 0.6; }
+        match                 app-id="nnn-picker"
+        open-floating         true
+        open-on-output        "focused"
+        default-column-width  { proportion 0.5; }
+        default-window-height { proportion 0.6; }
 }
 
 window-rule {
- match          title="tui-float"
- open-floating  true
- open-on-output "focused"
+        match          title="tui-float"
+        open-floating  true
+        open-on-output "focused"
+}
+
+window-rule {
+        match          title="Medley"
+        open-floating  true
+        open-on-output "focused"
  }
 
 window-rule {
- match          app-id="emskin"
- open-maximized true
+        match          app-id="emskin"
+        open-maximized true
 }
 
 animations{
@@ -165,7 +171,7 @@ animations{
 }
 
 switch-events {
-    lid-open {
-             spawn "sh" "-c" "hyprlock"
-    }
+        lid-open {
+                spawn "sh" "-c" "hyprlock"
+        }
 }
