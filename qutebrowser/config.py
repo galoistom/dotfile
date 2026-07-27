@@ -153,6 +153,7 @@ config.set('content.local_content_can_access_file_urls', False, 'file:///home/ga
 #   - system: Use the system wide proxy.
 #   - none: Don't use any proxy
 c.content.proxy = 'http://127.0.0.1:7890'
+# config.set('content.proxy', 'http://100.91.193.63', '100.91.193.63')
 
 # CSS border value for hints.
 # Type: String
@@ -531,7 +532,13 @@ c.colors.webpage.darkmode.policy.images = 'never'
 # 另外，建议开启以下设置以获得更好的对比度效果
 #c.colors.webpage.darkmode.threshold.background = 205  # 只有亮度高于此值的背景才会被变黑
 #c.colors.webpage.darkmode.threshold.text = 150        # 只有亮度低于此值的文字才会被变亮
-c.content.pdfjs = True
+c.content.pdfjs = False
+# 当你用键盘定位到 PDF 链接（输入 f 出现元素标号）后，
+# 输入 ;p 就会直接下载并唤醒 Okular 打开这个 URL
+config.bind(';p', 'hint links spawn okular {hint-url}')
+# config.py 中添加
+# config.set('content.download_location', '/tmp')
+# config.set('content.pdfjs', True)
 
 # 设置文件选择器为脚本模式
 config.set('fileselect.handler', 'external')

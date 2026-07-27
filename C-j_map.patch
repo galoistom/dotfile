@@ -1,0 +1,14 @@
+diff --git a/crates/emskin/src/input.rs b/crates/emskin/src/input.rs
+index f14cb04..46c85c4 100644
+--- a/crates/emskin/src/input.rs
++++ b/crates/emskin/src/input.rs
+@@ -48,7 +48,8 @@ impl EmskinState {
+                             }
+                         }
+ 
+-                        (modifiers.ctrl && matches!(key, keysyms::KEY_x | keysyms::KEY_c))
++                        (modifiers.ctrl
++                            && matches!(key, keysyms::KEY_x | keysyms::KEY_c | keysyms::KEY_j))
+                             || (modifiers.alt && key == keysyms::KEY_x)
+                     },
+                 );

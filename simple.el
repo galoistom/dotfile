@@ -8,6 +8,7 @@
 (display-time-mode t)
 (window-divider-mode t)
 (electric-pair-mode 1)
+(column-number-mode t)
 (setq scroll-step 1)                ; 每次滚动 1 行
 (setq scroll-conservatively 10000)
 (setq scroll-margin 9)
@@ -21,7 +22,7 @@
   (capitalize-word 1))
 
 (define-minor-mode my-cj-mode
-  "Force C-j to be C-x map."
+  "Force \\[keyboard-quit] to be \\<ctl-x-map>\\[ctl-x-map] map."
   :global t
   :type 'boolean
   :group 'my-config
@@ -65,5 +66,6 @@
 (global-set-key (kbd "C-c z")        #'zap-to-char)
 (global-set-key (kbd "C-c c")        #'my/capital-forward)
 (global-set-key (kbd "C-c r")        #'rgrep)
+(global-set-key (kbd "C-c e")        #'eshell)
 (global-set-key (kbd "C-c D")        #'kill-whole-line)
 (global-set-key (kbd "C-c i")        #'indent-region)

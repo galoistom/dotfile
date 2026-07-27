@@ -10,8 +10,10 @@ spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 spawn-at-startup "wl-clip-persist" "--clipboard" "regular"
 spawn-at-startup "swaybg" "-m" "fill" "-i" "/home/galoistom/Pictures/12-Dark.jpg"
 spawn-at-startup "systemctl" "--user" "import-environment" "WAYLAND_DISPLAY" "DBUS_SESSION_BUS_ADDRESS" "XDG_CURRENT_DESKTOP"
+spawn-at-startup "dbus-update-activation-environment" "--systemd" "WAYLAND_DISPLAY" "XDG_CURRENT_DESKTOP"
 spawn-at-startup "systemctl" "--user" "start" "emacs.service"
 
+//spawn-at-startup "systemctl" "--user" "import-environment" "WAYLAND_DISPLAY" "XDG_CURRENT_DESKTOP"
 //spawn-at-startup "swaybg" "-m" "fill" "-i" "/home/galoistom/Pictures/20260406212754(32).png"
 //spawn-at-startup "emacs" "--daemon"
 //spawn-at-startup "localsend"
@@ -31,6 +33,10 @@ input {
         touch {
                 off
         }
+}
+
+environment {
+    "GTK_THEME" "Adwaita-dark"
 }
 
 cursor{
@@ -93,7 +99,7 @@ binds {
         Alt+Shift+F   { spawn "zen-browser"; }
         Alt+Shift+P   { spawn "zen-browser"  "--private-window"; }
         Alt+M         { spawn "emacsclient"  "-c";               }
-        Alt+Control+K { spawn "emskin";      }
+        Alt+Control+K { spawn "emskin"       "--fullscreen";     }
         Alt+Shift+M   { spawn "systemctl"    "--user"            "start" "emacs.service"; }
                 
         Alt+U      hotkey-overlay-title="music"         { spawn "kitty"     "--title" "tui-float" "rmpc";    }
@@ -133,9 +139,8 @@ binds {
         Alt+Shift+S { screenshot; }
         Alt+Ctrl+E  { spawn        "togglescreen";}
 
-        
-        XF86AudioRaiseVolume  { spawn "wpctl"         "set-volume" "-l"                   "1"       "@DEFAULT_AUDIO_SINK@" "5%+"; }
-        XF86AudioLowerVolume  { spawn "wpctl"         "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-";    }
+        XF86AudioRaiseVolume  { spawn "sh" "-c" "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+ && wp-vol"; }
+        XF86AudioLowerVolume  { spawn "sh" "-c" "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- && wp-vol"; }
         XF86AudioMute         { spawn "wpctl"         "set-mute"   "@DEFAULT_AUDIO_SINK@" "toggle"; }
         XF86MonBrightnessUp   { spawn "brightnessctl" "set"        "5%+";                 }
         XF86MonBrightnessDown { spawn "brightnessctl" "set"        "5%-";                 }
@@ -153,17 +158,6 @@ window-rule {
         match          title="tui-float"
         open-floating  true
         open-on-output "focused"
-}
-
-window-rule {
-        match          title="Medley"
-        open-floating  true
-        open-on-output "focused"
- }
-
-window-rule {
-        match          app-id="emskin"
-        open-maximized true
 }
 
 animations{
