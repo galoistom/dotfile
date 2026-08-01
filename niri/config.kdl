@@ -48,6 +48,12 @@ output "DP-2" {
         mode "2560x1440@165.000"
         focus-at-startup
 }
+
+output "DP-1" {
+        mode "2560x1440@144.000"
+        focus-at-startup
+}
+
 output "eDP-1" {
         variable-refresh-rate on-demand=true
 }
@@ -109,16 +115,21 @@ binds {
         Mod+Alt+L  hotkey-overlay-title="hyprlock"      { spawn "hyprlock"; }
         Mod+Alt+S  hotkey-overlay-title="suspend"       { spawn "systemctl" "suspend"; }
         Alt+Ctrl+V hotkey-overlay-title="clipboard"     { spawn "kitty" "--single-instance" "--title" "tui-float" "-e" "cliphist-tui"; }                
-        Alt+H    { focus-column-left;              }
-        Alt+L    { focus-column-right;             }
-        Alt+J    { focus-window-or-workspace-down; }
-        Alt+K    { focus-window-or-workspace-up;   }
-        Alt+A    { maximize-column;               }        
+
+        Alt+H      { focus-column-left;              }
+        Alt+L      { focus-column-right;             }
+        Alt+J      { focus-window-or-workspace-down; }
+        Alt+K      { focus-window-or-workspace-up;   }
+        Alt+A      { maximize-column;                }
+        Alt+Left   { focus-monitor-left;             }
+        Alt+Right  { focus-monitor-right;            }
         
-        Alt+Shift+H { move-column-left;              }
-        Alt+Shift+L { move-column-right;             }
-        Alt+Shift+J { move-window-to-workspace-down; }
-        Alt+Shift+K { move-window-to-workspace-up;   }
+        Alt+Shift+H     { move-column-left;              }
+        Alt+Shift+L     { move-column-right;             }
+        Alt+Shift+J     { move-window-to-workspace-down; }
+        Alt+Shift+K     { move-window-to-workspace-up;   }
+        Alt+Shift+Left  { move-window-to-monitor-left;   }
+        Alt+Shift+Right { move-window-to-monitor-right;  }
         
         Mod+Alt+J   { focus-workspace-down;}
         Mod+Alt+K   { focus-workspace-up;}
