@@ -54,6 +54,11 @@ output "DP-1" {
         focus-at-startup
 }
 
+output "DP-3" {
+        mode "2560x1440@144.000"
+        focus-at-startup
+}
+
 output "eDP-1" {
         variable-refresh-rate on-demand=true
 }
@@ -175,8 +180,8 @@ animations{
         off
 }
 
-switch-events {
-        lid-open {
-                spawn "sh" "-c" "hyprlock"
-        }
-}
+// switch-events {
+//         lid-open {
+//                 spawn "sh" "-c" "hyprlock"
+//         }
+// }
