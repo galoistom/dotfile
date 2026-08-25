@@ -101,9 +101,10 @@ binds {
         Alt+Return    { spawn                     "kitty"; }
         Alt+Q         { close-window;             }
         Alt+Shift+E   { quit;                     }
-        Alt+D         hotkey-overlay-title="rofi" { spawn  "rofi"  "-show"      "combi"; }
-        Alt+Control+R { spawn                     "rofi"   "-show" "power-menu" "-modi"  "power-menu:rofi-power-menu"; }
         Mod+Alt+H     { show-hotkey-overlay;      }
+        Alt+D         hotkey-overlay-title="rofi"       { spawn  "rofi"  "-show" "combi"; }
+        Alt+Control+R hotkey-overlay-title="power-menu" { spawn  "rofi"  "-show" "power-menu" "-modi"  "power-menu:rofi-power-menu"; }
+
         
         Alt+N         { spawn "kitty"        "-e"                "zsh"   "-i"             "-c" "nnn"; }
         Alt+I         { spawn "qutebrowser"; }
@@ -115,6 +116,7 @@ binds {
                 
         Alt+U      hotkey-overlay-title="music"         { spawn "kitty"     "--title" "tui-float" "rmpc";    }
         Mod+V      hotkey-overlay-title="network"       { spawn "kitty"     "--title" "tui-float" "nmtui";   }
+        Mod+P      hotkey-overlay-title="sound"         { spawn "kitty"     "--title" "tui-float" "wiremix"; }
         Mod+B      hotkey-overlay-title="bluetooth"     { spawn "kitty"     "--title" "tui-float" "bluetui"; }
         Mod+F      hotkey-overlay-title="switch window" { spawn "rofi"      "-show"     "window";  }
         Mod+Alt+L  hotkey-overlay-title="hyprlock"      { spawn "hyprlock"; }
@@ -146,7 +148,7 @@ binds {
         
         Mod+W         { fullscreen-window;             }
         Mod+C         { center-window;                 }
-        Mod+T         {toggle-column-tabbed-display;   }
+        Mod+T         { toggle-column-tabbed-display;  }
         Mod+Space     { toggle-window-floating;        }
         Mod+Alt+O     { toggle-overview;               }
         Mod+Alt+n     { consume-or-expel-window-left;  }
@@ -177,7 +179,7 @@ window-rule {
 }
 
 animations{
-        off
+        // off
 }
 
 // switch-events {
