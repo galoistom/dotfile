@@ -99,7 +99,7 @@ recent-windows {
 
 binds {
         Alt+Return    { spawn                     "kitty"; }
-        Alt+Q         { close-window;             }
+        Mod+Q         { close-window;             }
         Alt+Shift+E   { quit;                     }
         Mod+Alt+H     { show-hotkey-overlay;      }
         Alt+D         hotkey-overlay-title="rofi"       { spawn  "rofi"  "-show" "combi"; }
@@ -154,8 +154,8 @@ binds {
         Mod+Alt+n     { consume-or-expel-window-left;  }
         Mod+Alt+m     { consume-or-expel-window-right; }
         
-        Alt+Shift+S { screenshot; }
-        Alt+Ctrl+E  { spawn        "togglescreen";}
+        Mod+Shift+S { screenshot; }
+        Mod+Ctrl+E  { spawn        "togglescreen";}
 
         XF86AudioRaiseVolume  { spawn "sh" "-c" "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+ && wp-vol"; }
         XF86AudioLowerVolume  { spawn "sh" "-c" "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- && wp-vol"; }

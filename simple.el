@@ -33,44 +33,91 @@
   (setq which-key-side-window-location 'bottom)
   (setq which-key-max-description-length 40)
   (setq which-key-max-display-columns nil))
+(require 'dabbrev)
 
-(require 'time)
-(setq display-time-format "󰥔 %d %H:%M")
-(setq display-time-default-load-average nil)
-(display-time-mode t)
+(defun my/safe-dabbrev-capf ()
+  "Use adabberv savely."
+  (when (thing-at-point 'symbol)
+    (ignore-errors
+      (dabbrev-capf))))
+
+(defun my/use-dabbrev-capf ()
+  "Complition."
+  (add-hook 'completion-at-point-functions #'my/safe-dabbrev-capf -100 t))
+
+(add-hook 'prog-mode-hook #'my/use-dabbrev-capf)
+(add-hook 'text-mode-hook #'my/use-dabbrev-capf)
+
+(setq dabbrev-case-fold-search t
+      dabbrev-check-all-buffers t
+      dabbrev-ignored-buffer-regexps '("^ " "\\*Messages\\*" "\\*Help\\*"))
 
 (require 'battery)
-(setq battery-mode-line-format nil)
-(defun dynamic-battery-show ()
-  "Dynamically show battery status."
-  (if (not (fboundp battery-status-function))
-      "foo"
-    (let* ((bat-status (funcall battery-status-function))
-           (online (string-equal (cdr (assoc 76 bat-status)) "on-line"))
-           (color (if online "#30c97b" "#F54927"))
-           (bat-str (if (string-equal (cdr (assoc 66 bat-status)) "charging")
-                        (battery-format "󰂄%p" bat-status)
-                        (battery-format "󰁹%p" bat-status))))
-      (propertize bat-str 'face `(:weight bold :foreground ,color)))))
+(setq battery-mode-line-format "")
+(defun my-dynamic-battery-show (&optional bat-status)
+  "Render battery string from BAT-STATUS alist."
+  (let ((bat-data (or bat-status
+                      (and (boundp 'battery-status-function)
+                           battery-status-function
+                           (fboundp battery-status-function)
+                           (ignore-errors (funcall battery-status-function))))))
+    (if (not bat-data) ""
+      (ignore-errors
+        (let* ((online (string-equal (battery-format "%L" bat-data) "on-line"))
+               (color (if online "#30c97b" "#ffffff"))
+               (bat-str (if (string-equal (battery-format "%B" bat-data) "charging")
+                            (battery-format "󰂄%p%% " bat-data)
+                          (battery-format "󰁹%p%% " bat-data))))
+          (propertize bat-str 'face `(:weight bold :foreground ,color)))))))
+(defvar my-battery-status "" "Used to show battery status.")
+(put 'my-battery-status 'risky-local-variable t)
+(defun my-update-battery (&optional status)
+  "Update the STATUS of battery component."
+  (setq my-battery-status (my-dynamic-battery-show status))
+  (force-mode-line-update t))
+(add-hook 'battery-update-functions #'my-update-battery)
+(setq battery-update-interval 15)
 (display-battery-mode 1)
-(setq-default mode-line-format
-              '("%e" mode-line-front-space
+(my-update-battery)
+
+(defvar-local my-word-count-string "" "Used to count word number.")
+(put 'my-word-count-string 'risky-local-variable t)
+(defun my-update-word-count ()
+  "Update word count."
+  (interactive)
+  (setq my-word-count-string
+        (propertize (format " 󰌨 %d " (count-words (point-min) (point-max)))
+                    'face '(:foreground "#8ac6f2"))))
+(my-update-word-count)
+(add-hook 'after-save-hook #'my-update-word-count)
+(add-hook 'find-file-hook #'my-update-word-count)
+
+(defvar my-mode-line-format '("%e" mode-line-front-space
                (:propertize (""
                              mode-line-mule-info
                              mode-line-client
                              mode-line-modified
                              mode-line-remote
-                             mode-line-window-dedicated) display (min-width (6.0)))
+                             mode-line-window-dedicated)
+                            display (min-width (6.0)))
                "  " mode-line-position
+               my-word-count-string
                mode-line-frame-identification
                mode-line-buffer-identification
                (project-mode-line project-mode-line-format)
-               (vc-mode vc-mode)
                mode-line-format-right-align
-               (:eval (dynamic-battery-show)) " "
+               my-battery-status
+               (vc-mode vc-mode) " "
                mode-line-modes
                mode-line-misc-info
                mode-line-end-spaces))
+(setq-default mode-line-format my-mode-line-format)
+(define-minor-mode my-hide-sidebar
+  "Toggle modeline."
+  :lighter " math-fill"
+  (if my-hide-sidebar
+      (setq-local mode-line-format nil)
+    (setq-local mode-line-format my-mode-line-format)))
 
 (dolist (hook '(eshell-mode-hook))
   (add-hook hook
@@ -127,6 +174,7 @@
 (global-set-key (kbd "C-x C-a") #'replace-regexp)
 (global-set-key (kbd "C-x c")   #'compile)
 (global-set-key (kbd "C-x C-q") #'kill-emacs)
+(global-set-key (kbd "C-c C-j") #'my-hide-sidebar)
 
 (global-set-key (kbd "C-c z")   #'zap-to-char)
 (global-set-key (kbd "C-c c")   #'my/capital-forward)
