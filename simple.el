@@ -33,24 +33,24 @@
   (setq which-key-side-window-location 'bottom)
   (setq which-key-max-description-length 40)
   (setq which-key-max-display-columns nil))
+
 (require 'dabbrev)
+(defun my/pure-buffer-words-capf ()
+  (let ((bounds (bounds-of-thing-at-point 'symbol)))
+    (when bounds
+      (list (car bounds)
+            (cdr bounds)
+            (completion-table-with-cache
+             (lambda (string)
+               (dabbrev--find-all-expansions string t)))
+            :exclusive 'no))))
 
-(defun my/safe-dabbrev-capf ()
-  "Use adabberv savely."
-  (when (thing-at-point 'symbol)
-    (ignore-errors
-      (dabbrev-capf))))
-
-(defun my/use-dabbrev-capf ()
-  "Complition."
-  (add-hook 'completion-at-point-functions #'my/safe-dabbrev-capf -100 t))
-
-(add-hook 'prog-mode-hook #'my/use-dabbrev-capf)
-(add-hook 'text-mode-hook #'my/use-dabbrev-capf)
-
+(defun my/setup-pure-buffer-capf ()
+  (add-hook 'completion-at-point-functions #'my/pure-buffer-words-capf -100 t))
+(add-hook 'prog-mode-hook #'my/setup-pure-buffer-capf)
+(add-hook 'text-mode-hook #'my/setup-pure-buffer-capf)
 (setq dabbrev-case-fold-search t
-      dabbrev-check-all-buffers t
-      dabbrev-ignored-buffer-regexps '("^ " "\\*Messages\\*" "\\*Help\\*"))
+      dabbrev-check-all-buffers t)
 
 (require 'battery)
 (setq battery-mode-line-format "")

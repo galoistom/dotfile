@@ -1,0 +1,33 @@
+#!/usr/bin/env guile
+!#
+
+(use-modules (json)
+             (ice-9 popen)
+             (ice-9 rdelim)
+             (ice-9 regex))
+
+(define (get-output cmd)
+  (let* ((port (open-input-pipe cmd))
+         (str (read-delimited "" port)))
+    (close-pipe port)
+    (or str "")))
+
+(define (restart-xwayland)
+  (system "pkill xwayland-satellite")
+  (sleep 1)
+  (system "xwayland-satellite &"))
+
+(define (sync-monitors-json)
+  (let* ((raw-json (get-output "niri msg -j outputs"))
+         (outputs (json-string->scm raw-json))
+         (external (filter (lambda (out)
+                             (let ((name (assoc-ref out "name")))
+                               (and (string-contains name "DP-")
+                                    (not (string-prefix? "e" name)))))
+                           outputs)))
+    (unless (null? external)
+      (if (eq? (assoc-ref (assoc-ref outputs "eDP-1") "logical") 'null)
+          (system "niri msg output eDP-1 on")
+          (system "niri msg output eDP-1 off")))))
+(restart-xwayland)
+(sync-monitors-json)
