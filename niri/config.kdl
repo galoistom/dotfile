@@ -40,8 +40,8 @@ environment {
 }
 
 cursor{
-xcursor-theme "Bibata-Modern-Classic"
-xcursor-size 24
+        xcursor-theme "Bibata-Modern-Classic"
+        xcursor-size 24
 }
 
 output "DP-2" {
@@ -70,6 +70,7 @@ layout {
                 active-color "#bd93f9ff"
                 inactive-color "#595959aa"
         }
+        center-focused-column "on-overflow"
         empty-workspace-above-first
 }
 
@@ -99,21 +100,21 @@ recent-windows {
 
 binds {
         Alt+Return    { spawn                     "kitty"; }
-        Mod+Q         { close-window;             }
-        Alt+Shift+E   { quit;                     }
+        Alt+Q         { close-window;             }
+        Mod+Shift+E   { quit;                     }
         Mod+Alt+H     { show-hotkey-overlay;      }
-        Alt+D         hotkey-overlay-title="rofi"       { spawn  "rofi"  "-show" "combi"; }
+        Mod+D         hotkey-overlay-title="rofi"       { spawn  "rofi"  "-show" "combi"; }
         Alt+Control+R hotkey-overlay-title="power-menu" { spawn  "rofi"  "-show" "power-menu" "-modi"  "power-menu:rofi-power-menu"; }
 
         
         Alt+N         { spawn "kitty"        "-e"                "zsh"   "-i"             "-c" "nnn"; }
         Alt+I         { spawn "qutebrowser"; }
-        Alt+Shift+F   { spawn "zen-browser"; }
-        Alt+Shift+P   { spawn "zen-browser"  "--private-window"; }
+        Mod+Shift+F   { spawn "zen-browser"; }
+        Mod+Shift+P   { spawn "zen-browser"  "--private-window"; }
         Alt+M         { spawn "emacsclient"  "-c";               }
         Alt+Control+K { spawn "emskin"       "--fullscreen";     }
         Alt+Shift+M   { spawn "systemctl"    "--user"            "start" "emacs.service"; }
-                
+
         Alt+U      hotkey-overlay-title="music"         { spawn "kitty"     "--title" "tui-float" "rmpc";    }
         Mod+V      hotkey-overlay-title="network"       { spawn "kitty"     "--title" "tui-float" "nmtui";   }
         Mod+P      hotkey-overlay-title="sound"         { spawn "kitty"     "--title" "tui-float" "wiremix"; }
@@ -138,18 +139,15 @@ binds {
         Alt+Shift+Left  { move-window-to-monitor-left;   }
         Alt+Shift+Right { move-window-to-monitor-right;  }
         
-        Mod+Alt+J   { focus-workspace-down;}
-        Mod+Alt+K   { focus-workspace-up;}
-        
-        Mod+H    { set-column-width  "-5%"; }
-        Mod+L    { set-column-width  "+5%"; }
-        Mod+K    { set-window-height "-5%"; }
-        Mod+J    { set-window-height "+5%"; }
+        Mod+Ctrl+H    { set-column-width  "-5%"; }
+        Mod+Ctrl+L    { set-column-width  "+5%"; }
+        Mod+Ctrl+K    { set-window-height "-5%"; }
+        Mod+Ctrl+J    { set-window-height "+5%"; }
         
         Mod+W         { fullscreen-window;             }
         Mod+C         { center-window;                 }
         Mod+T         { toggle-column-tabbed-display;  }
-        Mod+Space     { toggle-window-floating;        }
+        Mod+Alt+F     { toggle-window-floating;        }
         Mod+Alt+O     { toggle-overview;               }
         Mod+Alt+n     { consume-or-expel-window-left;  }
         Mod+Alt+m     { consume-or-expel-window-right; }
@@ -178,8 +176,13 @@ window-rule {
         open-on-output "focused"
 }
 
+window-rule {
+    match title=r#".*FreeRDP.*"#
+    open-floating true
+}
+
 animations{
-        // off
+        off
 }
 
 // switch-events {

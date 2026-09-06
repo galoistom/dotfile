@@ -34,23 +34,54 @@
   (setq which-key-max-description-length 40)
   (setq which-key-max-display-columns nil))
 
-(require 'dabbrev)
-(defun my/pure-buffer-words-capf ()
-  (let ((bounds (bounds-of-thing-at-point 'symbol)))
-    (when bounds
-      (list (car bounds)
-            (cdr bounds)
-            (completion-table-with-cache
-             (lambda (string)
-               (dabbrev--find-all-expansions string t)))
-            :exclusive 'no))))
+(defun my/ido-sudo-find-file ()
+  "Use ido to check file and open it with sudo."
+  (interactive)
+  (let ((file (ido-read-file-name "Open with sudo: ")))
+    (when file (find-file (concat "/sudo::" file)))))
 
-(defun my/setup-pure-buffer-capf ()
-  (add-hook 'completion-at-point-functions #'my/pure-buffer-words-capf -100 t))
-(add-hook 'prog-mode-hook #'my/setup-pure-buffer-capf)
-(add-hook 'text-mode-hook #'my/setup-pure-buffer-capf)
-(setq dabbrev-case-fold-search t
-      dabbrev-check-all-buffers t)
+(defun my/ssh-tramp (host &optional path)
+  "Connect to HOST via TRAMP SSH and open PATH (defaults to home)."
+  (interactive "sSSH to (e.g. user@host): ")
+  (let ((remote-path (format "/ssh:%s:%s" host (or path "~"))))
+    (find-file remote-path)))
+
+(defun my/move-line-down ()
+  "Move line Down and keep cursor."
+  (interactive)
+  (let ((col (current-column)))
+    (forward-line 1)
+    (transpose-lines 1)
+    (forward-line -1)
+    (move-to-column col)))
+
+(defun my/move-line-up ()
+  "Move line up and keep cursor."
+  (interactive)
+  (let ((col (current-column)))
+    (transpose-lines 1)
+    (forward-line -2)
+    (move-to-column col)))
+
+(defun my/isearch-region-or-start ()
+  "Search content if region is marked, otherwise normal isearch"
+  (interactive)
+  (if (use-region-p)
+      (let ((text (buffer-substring-no-properties (region-beginning) (region-end))))
+        (deactivate-mark)
+        (isearch-mode t)
+        (isearch-yank-string text))
+    (isearch-forward)))
+
+(defun my/isearch-region-back-or-start ()
+  "Search content if region is marked, otherwise normal isearch"
+  (interactive)
+  (if (use-region-p)
+      (let ((text (buffer-substring-no-properties (region-beginning) (region-end))))
+        (deactivate-mark)
+        (isearch-mode t)
+        (isearch-yank-string text))
+    (isearch-backward)))
 
 (require 'battery)
 (setq battery-mode-line-format "")
@@ -144,7 +175,9 @@
 	    (define-key map (kbd "C-c C-d") #'backward-kill-word)
 	    (define-key map (kbd "C-c d")   #'kill-word)
 	    (define-key map (kbd "M-e")     #'mark-word)
-            map))
+            (define-key map (kbd "C-c C-p") #'my/move-line-up)
+            (define-key map (kbd "C-c C-n") #'my/move-line-down)
+          map))
 
 (my-cj-mode 1)
 
@@ -172,9 +205,9 @@
 (global-set-key (kbd "C-M-f")   #'up-list)
 
 (global-set-key (kbd "C-x C-a") #'replace-regexp)
-(global-set-key (kbd "C-x c")   #'compile)
 (global-set-key (kbd "C-x C-q") #'kill-emacs)
 (global-set-key (kbd "C-c C-j") #'my-hide-sidebar)
+(global-set-key (kbd "C-x c")   #'compile)
 
 (global-set-key (kbd "C-c z")   #'zap-to-char)
 (global-set-key (kbd "C-c c")   #'my/capital-forward)
@@ -182,3 +215,4 @@
 (global-set-key (kbd "C-c e")   #'eshell)
 (global-set-key (kbd "C-c D")   #'kill-whole-line)
 (global-set-key (kbd "C-c i")   #'indent-region)
+(global-set-key (kbd "C-c E")   #'query-replace)
