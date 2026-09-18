@@ -8,6 +8,11 @@
 (window-divider-mode t)
 (electric-pair-mode 1)
 (column-number-mode t)
+;; (setopt completion-eager-display t) ; New in 31.1
+;; (setopt completion-eager-update t) ; New in 31.1
+;; (setopt minibuffer-visible-completions t)
+;; (setopt completions-sort 'historical)
+(setopt completions-format 'one-column)
 (setq scroll-step 1)                ; 每次滚动 1 行
 (setq scroll-conservatively 10000)
 (setq scroll-margin 9)
@@ -19,6 +24,7 @@
 (setq auto-save-interval 50)
 (setq dired-listing-switches "-alhn")
 (global-display-line-numbers-mode t)
+(setq elisp-fontify-semantically t)
 (setq gc-cons-threshold (* 16 1024 1024))
 (setq read-process-output-max (* 3 1024 1024))
 (defun my/create-non-existent-directories ()
@@ -64,7 +70,7 @@
     (move-to-column col)))
 
 (defun my/isearch-region-or-start ()
-  "Search content if region is marked, otherwise normal isearch"
+  "Search content if region is marked, otherwise normal isearch."
   (interactive)
   (if (use-region-p)
       (let ((text (buffer-substring-no-properties (region-beginning) (region-end))))
@@ -74,7 +80,7 @@
     (isearch-forward)))
 
 (defun my/isearch-region-back-or-start ()
-  "Search content if region is marked, otherwise normal isearch"
+  "Search content if region is marked, otherwise normal isearch."
   (interactive)
   (if (use-region-p)
       (let ((text (buffer-substring-no-properties (region-beginning) (region-end))))
@@ -143,17 +149,6 @@
                mode-line-misc-info
                mode-line-end-spaces))
 (setq-default mode-line-format my-mode-line-format)
-(define-minor-mode my-hide-sidebar
-  "Toggle modeline."
-  :lighter " math-fill"
-  (if my-hide-sidebar
-      (setq-local mode-line-format nil)
-    (setq-local mode-line-format my-mode-line-format)))
-
-(dolist (hook '(eshell-mode-hook))
-  (add-hook hook
-            (lambda ()
-              (setq-local mode-line-format nil))))
 
 (use-package esh-mode
   :config
@@ -200,13 +195,14 @@
 (global-set-key (kbd "s-s")     #'save-buffer)
 (global-set-key (kbd "s-d")     #'backward-delete-char)
 (global-set-key (kbd "s-f")     #'ido-find-file)
+(global-set-key (kbd "M-+")     #'text-scale-increase)
+(global-set-key (kbd "M-_")     #'text-scale-decrease)
 (global-set-key (kbd "C-<tab>") #'other-window)
 (global-set-key (kbd "M-\"")    #'shell-command)
-(global-set-key (kbd "C-M-f")   #'up-list)
 
 (global-set-key (kbd "C-x C-a") #'replace-regexp)
 (global-set-key (kbd "C-x C-q") #'kill-emacs)
-(global-set-key (kbd "C-c C-j") #'my-hide-sidebar)
+(global-set-key (kbd "C-c C-j") #'mode-line-invisible-mode)
 (global-set-key (kbd "C-x c")   #'compile)
 
 (global-set-key (kbd "C-c z")   #'zap-to-char)

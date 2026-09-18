@@ -104,18 +104,17 @@ binds {
         Mod+Shift+E   { quit;                     }
         Mod+Alt+H     { show-hotkey-overlay;      }
         Mod+D         hotkey-overlay-title="rofi"       { spawn  "rofi"  "-show" "combi"; }
-        Alt+Control+R hotkey-overlay-title="power-menu" { spawn  "rofi"  "-show" "power-menu" "-modi"  "power-menu:rofi-power-menu"; }
+        Mod+Control+R hotkey-overlay-title="power-menu" { spawn  "rofi"  "-show" "power-menu" "-modi"  "power-menu:rofi-power-menu"; }
 
-        
         Alt+N         { spawn "kitty"        "-e"                "zsh"   "-i"             "-c" "nnn"; }
+        Alt+Shift+F   { spawn "firefox";     }
+        Alt+Shift+P   { spawn "firefox"      "--private-window"; }
         Alt+I         { spawn "qutebrowser"; }
-        Mod+Shift+F   { spawn "zen-browser"; }
-        Mod+Shift+P   { spawn "zen-browser"  "--private-window"; }
         Alt+M         { spawn "emacsclient"  "-c";               }
         Alt+Control+K { spawn "emskin"       "--fullscreen";     }
         Alt+Shift+M   { spawn "systemctl"    "--user"            "start" "emacs.service"; }
 
-        Alt+U      hotkey-overlay-title="music"         { spawn "kitty"     "--title" "tui-float" "rmpc";    }
+        Mod+U      hotkey-overlay-title="music"         { spawn "kitty"     "--title" "tui-float" "rmpc";    }
         Mod+V      hotkey-overlay-title="network"       { spawn "kitty"     "--title" "tui-float" "nmtui";   }
         Mod+P      hotkey-overlay-title="sound"         { spawn "kitty"     "--title" "tui-float" "wiremix"; }
         Mod+B      hotkey-overlay-title="bluetooth"     { spawn "kitty"     "--title" "tui-float" "bluetui"; }
@@ -128,6 +127,10 @@ binds {
         Alt+L      { focus-column-right;             }
         Alt+J      { focus-window-or-workspace-down; }
         Alt+K      { focus-window-or-workspace-up;   }
+        Mod+H      { focus-column-left;              }
+        Mod+J      { focus-workspace-down;           }
+        Mod+K      { focus-workspace-up;             }
+        Mod+L      { focus-column-right;             }
         Alt+A      { maximize-column;                }
         Alt+Left   { focus-monitor-left;             }
         Alt+Right  { focus-monitor-right;            }
@@ -149,8 +152,8 @@ binds {
         Mod+T         { toggle-column-tabbed-display;  }
         Mod+Alt+F     { toggle-window-floating;        }
         Mod+Alt+O     { toggle-overview;               }
-        Mod+Alt+n     { consume-or-expel-window-left;  }
-        Mod+Alt+m     { consume-or-expel-window-right; }
+        Mod+Ctrl+n    { consume-or-expel-window-left;  }
+        Mod+Ctrl+m    { consume-or-expel-window-right; }
         
         Mod+Shift+S { screenshot; }
         Mod+Ctrl+E  { spawn        "togglescreen";}
