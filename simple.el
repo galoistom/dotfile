@@ -8,17 +8,43 @@
 (window-divider-mode t)
 (electric-pair-mode 1)
 (column-number-mode t)
+(menu-bar-mode -1)
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
 ;; (setopt completion-eager-display t) ; New in 31.1
 ;; (setopt completion-eager-update t) ; New in 31.1
 ;; (setopt minibuffer-visible-completions t)
 ;; (setopt completions-sort 'historical)
-(setopt completions-format 'one-column)
-(setq scroll-step 1)                ; 每次滚动 1 行
-(setq scroll-conservatively 10000)
-(setq scroll-margin 9)
+;(setopt completions-format 'one-column)
+;; (setq scroll-step 1)                ; 每次滚动 1 行
+;; (setq scroll-conservatively 10000)
+;; (setq scroll-margin 9)
 (ido-mode t)
 (fido-mode 1)
-(load-theme 'wheatgrass t)
+;; 轻量 Dracula 风格：以内置 wombat 为底，只覆盖常用 face。
+(load-theme 'wombat t)
+(dolist (spec
+         '((default :background "black" :foreground "#f8f8f2")
+           (cursor :background "#f8f8f2")
+           (fringe :background "black")
+           (region :background "#44475a")
+           (mode-line :background "#44475a" :foreground "#f8f8f2")
+           (mode-line-inactive :background "black" :foreground "#6272a4")
+           (window-divider :foreground "#44475a")
+           (line-number :background "black" :foreground "#6272a4")
+           (line-number-current-line :background "black" :foreground "#ff79c6")
+           (minibuffer-prompt :foreground "#ff79c6")
+           (isearch :background "#ff79c6" :foreground "#282a36")
+           (lazy-highlight :background "#6272a4" :foreground "#f8f8f2")
+           (font-lock-comment-face :foreground "#6272a4")
+           (font-lock-keyword-face :foreground "#ff79c6")
+           (font-lock-string-face :foreground "#f1fa8c")
+           (font-lock-function-name-face :foreground "#50fa7b")
+           (font-lock-type-face :foreground "#8be9fd")
+           (font-lock-constant-face :foreground "#bd93f9")
+           (font-lock-builtin-face :foreground "#8be9fd")))
+  (apply #'set-face-attribute (car spec) nil (cdr spec)))
+(set-background-color "black")
 (setq auto-save-default t)
 (setq auto-save-timeout 5)
 (setq auto-save-interval 50)
@@ -32,6 +58,23 @@
     (when (and parent (not (file-exists-p parent)))
       (make-directory parent t))))
 
+(when (and (not (display-graphic-p))
+           (executable-find "wl-copy")
+           (executable-find "wl-paste"))
+  (setq interprogram-cut-function
+        (lambda (text)
+          (let ((process-connection-type nil))
+            (let ((proc (start-process "wl-copy" nil "wl-copy")))
+              (process-send-string proc text)
+              (process-send-eof proc)))))
+
+  (setq interprogram-paste-function
+        (lambda ()
+          (when (executable-find "wl-paste")
+            (string-trim-right
+             (shell-command-to-string "wl-paste -n"))))))
+
+
 (use-package which-key
   :config
   (which-key-mode 1)
@@ -39,6 +82,91 @@
   (setq which-key-side-window-location 'bottom)
   (setq which-key-max-description-length 40)
   (setq which-key-max-display-columns nil))
+
+;; 基于缓冲区文本的轻量自动补全提示。
+(require 'dabbrev)
+(defun my/add-dabbrev-capf ()
+  "Add dabbrev as a buffer-local completion source."
+  (add-hook 'completion-at-point-functions #'dabbrev-capf nil t))
+(add-hook 'prog-mode-hook #'my/add-dabbrev-capf)
+(add-hook 'text-mode-hook #'my/add-dabbrev-capf)
+(when (require 'completion-preview nil t)
+  (global-completion-preview-mode 1))
+
+;; flash.nvim 风格的可见区域搜索跳转。
+(defvar my/flash--overlays nil)
+
+(defun my/flash--clear ()
+  (mapc #'delete-overlay my/flash--overlays)
+  (setq my/flash--overlays nil))
+
+(defun my/flash--show (pattern)
+  "高亮当前窗口中的 PATTERN，并返回 ((LABEL . POS) ...)。"
+  (my/flash--clear)
+  (let ((case-fold-search (string= pattern (downcase pattern)))
+        (labels (string-to-list "asdfghjklqwertyuiopzxcvbnm"))
+        (positions nil))
+    (save-excursion
+      (goto-char (window-start))
+      (while (search-forward pattern (window-end nil t) t)
+        (push (match-beginning 0) positions)))
+    (setq positions (nreverse positions))
+    (dolist (pos positions)
+      ;; 避免标签与“继续输入搜索词”冲突。
+      (let ((next (char-after (+ pos (length pattern)))))
+        (when next
+          (setq labels (delq (downcase next) labels))))
+      (let ((ov (make-overlay pos (min (point-max)
+                                       (+ pos (length pattern))))))
+        (overlay-put ov 'face '(:background "#6272a4" :foreground "#f8f8f2"))
+        (push ov my/flash--overlays)))
+    (let ((pairs nil))
+      (dolist (pos (sort (copy-sequence positions)
+                         (lambda (a b)
+                           (< (abs (- a (point))) (abs (- b (point)))))))
+        (when labels
+          (let* ((label (char-to-string (pop labels)))
+                 (ov (make-overlay pos (1+ pos))))
+            (overlay-put ov 'display label)
+            (overlay-put ov 'priority 1)
+            (overlay-put ov 'face
+                         '(:background "#ff79c6" :foreground "#282a36" :weight bold))
+            (push ov my/flash--overlays)
+            (push (cons label pos) pairs))))
+      (nreverse pairs))))
+
+(defun my/flash-jump ()
+  "在当前窗口可见区域内按 flash.nvim 的方式跳转。"
+  (interactive)
+  (let ((pattern "")
+        (pairs nil))
+    (unwind-protect
+        (catch 'done
+          (while t
+            (setq pairs (if (string-empty-p pattern)
+                            (progn (my/flash--clear) nil)
+                          (my/flash--show pattern)))
+            (let ((key (condition-case nil
+                           (read-char-exclusive (concat "Flash: " pattern))
+                         (quit nil))))
+              (cond
+               ((null key) (throw 'done nil))
+               ((not (integerp key)) nil)
+               ((memq key '(27 7)) (throw 'done nil))
+               ((memq key '(127 8))
+                (if (string-empty-p pattern)
+                    (throw 'done nil)
+                  (setq pattern (substring pattern 0 -1))))
+               ((and (>= key 32) (<= key 126))
+                (let ((hit (assoc (char-to-string key) pairs)))
+                  (if hit
+                      (progn
+                        (push-mark (point) t)
+                        (goto-char (cdr hit))
+                        (throw 'done nil))
+                    (setq pattern (concat pattern (char-to-string key))))))
+               (t nil)))))
+      (my/flash--clear))))
 
 (defun my/ido-sudo-find-file ()
   "Use ido to check file and open it with sudo."
@@ -101,7 +229,7 @@
     (if (not bat-data) ""
       (ignore-errors
         (let* ((online (string-equal (battery-format "%L" bat-data) "on-line"))
-               (color (if online "#30c97b" "#ffffff"))
+               (color (if online "#50fa7b" "#ffffff"))
                (bat-str (if (string-equal (battery-format "%B" bat-data) "charging")
                             (battery-format "󰂄%p%% " bat-data)
                           (battery-format "󰁹%p%% " bat-data))))
@@ -124,7 +252,7 @@
   (interactive)
   (setq my-word-count-string
         (propertize (format " 󰌨 %d " (count-words (point-min) (point-max)))
-                    'face '(:foreground "#8ac6f2"))))
+                    'face '(:foreground "#8be9fd"))))
 (my-update-word-count)
 (add-hook 'after-save-hook #'my-update-word-count)
 (add-hook 'find-file-hook #'my-update-word-count)
@@ -153,6 +281,13 @@
 (use-package esh-mode
   :config
   (define-key eshell-mode-map (kbd "C-c e") (lambda () (interactive) (eshell t))))
+
+(use-package org
+  :config
+  ;; 关闭 Org-mode 默认的行截断行为
+  (setq org-startup-truncated nil)
+  ;; 为 Org-mode 开启视觉软换行（按单词边界智能折行）
+  (add-hook 'org-mode-hook #'visual-line-mode))
 
 (defun my/capital-forward ()
   "Capitalize-Word before cursor."
@@ -192,6 +327,7 @@
 (global-set-key (kbd "C-c w o") #'other-window)
 
 (global-set-key (kbd "C-.")     #'duplicate-line)
+(global-set-key (kbd "C-o")     #'my/flash-jump)
 (global-set-key (kbd "s-s")     #'save-buffer)
 (global-set-key (kbd "s-d")     #'backward-delete-char)
 (global-set-key (kbd "s-f")     #'ido-find-file)

@@ -1,0 +1,226 @@
+#!/usr/bin/env sh
+
+# Description: Regular mode:
+#                Fuzzy find a file in directory subtree.
+#                Opens files asynchronously or in a new terminal window
+#                so nnn is not blocked and both can be used simultaneously.
+#
+#              Picker mode:
+#                If picker mode output file is passed, it
+#                will be overwritten with any picked files.
+#                Leaves untouched if no file is picked.
+#                Works with single/multiple files selected.
+#
+# Dependencies: fd/find, fzf/skim, xdg-open/open (on macOS),
+#               terminal emulator (kitty, foot, alacritty, etc.) for CLI editors
+#
+# Environment variables for customization:
+#   FZOPEN_TERMINAL     : Force a specific terminal emulator (e.g. "kitty", "foot")
+#   FZOPEN_TEXT_OPENER  : Force a specific text editor command (e.g. "code", "gedit")
+#   FZOPEN_OPENER       : Force a specific opener for other files (e.g. "xdg-open")
+#
+# Shell: POSIX compliant
+# Author: Arun Prakash Jana (Updated to prevent blocking nnn)
+
+NUKE="${XDG_CONFIG_HOME:-$HOME/.config}/nnn/plugins/nuke"
+USE_NUKE=0
+
+# Safely source helper if present
+if [ -f "$(dirname "$0")/.nnn-plugin-helper" ]; then
+    # shellcheck disable=SC1090,SC1091
+    . "$(dirname "$0")/.nnn-plugin-helper"
+fi
+
+if type fzf >/dev/null 2>&1; then
+    cmd="$FZF_DEFAULT_COMMAND"
+    if type fd >/dev/null 2>&1; then
+        [ -z "$cmd" ] && cmd="fd -t f 2>/dev/null"
+    else
+        [ -z "$cmd" ] && cmd="find . -type f 2>/dev/null"
+    fi
+    entry="$(eval "$cmd" | fzf -m)"
+elif type sk >/dev/null 2>&1; then
+    entry=$(find . -type f 2>/dev/null | sk)
+else
+    exit 1
+fi
+
+# Check for picker mode
+if [ "$3" ]; then
+    if [ "$entry" ]; then
+        case "$entry" in
+            /*) fullpath="$entry" ;;
+            *)  fullpath="$PWD/${entry#./}" ;;
+        esac
+        if [ "-" = "$3" ]; then
+            printf "%s\n" "$fullpath"
+        else
+            printf "%s\n" "$fullpath" > "$3"
+        fi
+
+        # Tell `nnn` to clear its internal selection
+        [ -n "$NNN_PIPE" ] && printf "%s" "0p" > "$NNN_PIPE"
+    fi
+
+    exit 0
+fi
+
+[ -z "$entry" ] && exit 0
+
+if [ "$USE_NUKE" -ne 0 ] && [ -x "$NUKE" ]; then
+    "$NUKE" "$entry"
+    exit 0
+fi
+
+# Open the file
+cmd_file=""
+cmd_open=""
+if uname | grep -q "Darwin"; then
+    cmd_file="file -bIL"
+    cmd_open="open"
+else
+    cmd_file="file -biL"
+    cmd_open="xdg-open"
+fi
+
+# Detect available graphical terminal emulator for CLI text editors
+detect_terminal() {
+    if [ -n "$FZOPEN_TERMINAL" ] && type "$FZOPEN_TERMINAL" >/dev/null 2>&1; then
+        printf "%s" "$FZOPEN_TERMINAL"
+        return 0
+    fi
+    if [ -n "$TERMINAL" ] && type "$TERMINAL" >/dev/null 2>&1; then
+        printf "%s" "$TERMINAL"
+        return 0
+    fi
+    for term in kitty foot alacritty wezterm gnome-terminal xfce4-terminal konsole xterm; do
+        if type "$term" >/dev/null 2>&1; then
+            printf "%s" "$term"
+            return 0
+        fi
+    done
+    return 1
+}
+
+# Spawn CLI editor in a new terminal emulator window detached from nnn
+spawn_in_terminal() {
+    term="$1"
+    editor="$2"
+    file="$3"
+    title="editor: $(basename "$file")"
+
+    case "$term" in
+        kitty)
+            nohup kitty --title "$title" $editor "$file" >/dev/null 2>&1 &
+            ;;
+        foot)
+            nohup foot -T "$title" $editor "$file" >/dev/null 2>&1 &
+            ;;
+        alacritty)
+            nohup alacritty -T "$title" -e $editor "$file" >/dev/null 2>&1 &
+            ;;
+        wezterm)
+            nohup wezterm start -- $editor "$file" >/dev/null 2>&1 &
+            ;;
+        gnome-terminal)
+            nohup gnome-terminal --title="$title" -- $editor "$file" >/dev/null 2>&1 &
+            ;;
+        xfce4-terminal)
+            nohup xfce4-terminal --title="$title" -e "$editor \"$file\"" >/dev/null 2>&1 &
+            ;;
+        konsole)
+            nohup konsole -e $editor "$file" >/dev/null 2>&1 &
+            ;;
+        xterm)
+            nohup xterm -title "$title" -e $editor "$file" >/dev/null 2>&1 &
+            ;;
+        *)
+            nohup "$term" -e $editor "$file" >/dev/null 2>&1 &
+            ;;
+    esac
+}
+
+# Open text files without blocking nnn
+open_text_file() {
+    file="$1"
+
+    # 1. Custom text opener override
+    if [ -n "$FZOPEN_TEXT_OPENER" ]; then
+        nohup $FZOPEN_TEXT_OPENER "$file" >/dev/null 2>&1 &
+        return 0
+    fi
+
+    editor="${VISUAL:-${EDITOR:-vim}}"
+    editor_base=$(basename "$(printf "%s" "$editor" | awk '{print $1}')")
+
+    # 2. Known GUI editors can be run directly in the background
+    case "$editor_base" in
+        code|code-insiders|code-oss|vscodium|gedit|subl|sublime_text|kate|atom|notepadqq|mousepad|leafpad|xed|cudatext)
+            nohup $editor "$file" >/dev/null 2>&1 &
+            return 0
+            ;;
+    esac
+
+    # 3. On macOS, use default text editor
+    if uname | grep -q "Darwin"; then
+        nohup open -t "$file" >/dev/null 2>&1 &
+        return 0
+    fi
+
+    # 4. If graphical desktop is available (Wayland or X11), open in a new terminal window
+    if [ -n "$WAYLAND_DISPLAY" ] || [ -n "$DISPLAY" ]; then
+        term=$(detect_terminal)
+        if [ -n "$term" ]; then
+            spawn_in_terminal "$term" "$editor" "$file"
+            return 0
+        fi
+    fi
+
+    # 5. If running inside tmux, open in a new tmux window
+    if [ -n "$TMUX" ]; then
+        tmux new-window -n "editor" "$editor \"$file\""
+        return 0
+    fi
+
+    # 6. Fallback for pure console/TTY
+    $editor "$file"
+}
+
+# Open non-text files asynchronously without blocking nnn
+open_nontext_file() {
+    file="$1"
+    if [ -n "$FZOPEN_OPENER" ]; then
+        nohup $FZOPEN_OPENER "$file" >/dev/null 2>&1 &
+    else
+        nohup "$cmd_open" "$file" >/dev/null 2>&1 &
+    fi
+}
+
+# Process selected file(s)
+printf "%s\n" "$entry" | while IFS= read -r item; do
+    [ -z "$item" ] && continue
+
+    case "$item" in
+        /*) fullpath="$item" ;;
+        *)  fullpath="$PWD/${item#./}" ;;
+    esac
+
+    mime="$($cmd_file "$fullpath" 2>/dev/null)"
+
+    case "$mime" in
+        *empty*)
+            open_text_file "$fullpath"
+            ;;
+        *charset=binary*)
+            open_nontext_file "$fullpath"
+            ;;
+        *text*|*json*|*xml*|*yaml*|*javascript*|*csv*|*charset=*)
+            open_text_file "$fullpath"
+            ;;
+        *)
+            open_nontext_file "$fullpath"
+            ;;
+    esac
+done
+
+exit 0

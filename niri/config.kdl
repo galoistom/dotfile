@@ -5,6 +5,7 @@ spawn-at-startup "xrdb" "-merge" "/home/galoistom/.Xresources"
 spawn-at-startup "waybar"
 spawn-at-startup "dms"
 spawn-at-startup "mako"
+spawn-at-startup "gnome-keyring-daemon" "--start" "--components=secrets"
 spawn-at-startup "wl-paste" "--watch" "cliphist" "store"
 spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 spawn-at-startup "wl-clip-persist" "--clipboard" "regular"
@@ -99,6 +100,7 @@ recent-windows {
 }
 
 binds {
+        Mod+Ctrl+I    { spawn "/home/galoistom/test/editor.sh"; }
         Alt+Return    { spawn                     "kitty"; }
         Alt+Q         { close-window;             }
         Mod+Shift+E   { quit;                     }
@@ -123,17 +125,17 @@ binds {
         Mod+Alt+S  hotkey-overlay-title="suspend"       { spawn "systemctl" "suspend"; }
         Alt+Ctrl+V hotkey-overlay-title="clipboard"     { spawn "kitty" "--single-instance" "--title" "tui-float" "-e" "cliphist-tui"; }                
 
-        Alt+H      { focus-column-left;              }
-        Alt+L      { focus-column-right;             }
-        Alt+J      { focus-window-or-workspace-down; }
-        Alt+K      { focus-window-or-workspace-up;   }
-        Mod+H      { focus-column-left;              }
-        Mod+J      { focus-workspace-down;           }
-        Mod+K      { focus-workspace-up;             }
-        Mod+L      { focus-column-right;             }
-        Alt+A      { maximize-column;                }
-        Alt+Left   { focus-monitor-left;             }
-        Alt+Right  { focus-monitor-right;            }
+        Alt+H           { focus-column-left;              }
+        Alt+L           { focus-column-right;             }
+        Alt+J           { focus-window-or-workspace-down; }
+        Alt+K           { focus-window-or-workspace-up;   }
+        Mod+H           { focus-column-left;              }
+        Mod+J           { focus-workspace-down;           }
+        Mod+K           { focus-workspace-up;             }
+        Mod+L           { focus-column-right;             }
+        Alt+A           { maximize-column;                }
+        Alt+Left        { focus-monitor-left;             }
+        Alt+Right       { focus-monitor-right;            }
         
         Alt+Shift+H     { move-column-left;              }
         Alt+Shift+L     { move-column-right;             }
@@ -142,27 +144,31 @@ binds {
         Alt+Shift+Left  { move-window-to-monitor-left;   }
         Alt+Shift+Right { move-window-to-monitor-right;  }
         
-        Mod+Ctrl+H    { set-column-width  "-5%"; }
-        Mod+Ctrl+L    { set-column-width  "+5%"; }
-        Mod+Ctrl+K    { set-window-height "-5%"; }
-        Mod+Ctrl+J    { set-window-height "+5%"; }
+        Mod+Ctrl+H      { set-column-width  "-5%"; }
+        Mod+Ctrl+L      { set-column-width  "+5%"; }
+        Mod+Ctrl+K      { set-window-height "-5%"; }
+        Mod+Ctrl+J      { set-window-height "+5%"; }
         
-        Mod+W         { fullscreen-window;             }
-        Mod+C         { center-window;                 }
-        Mod+T         { toggle-column-tabbed-display;  }
-        Mod+Alt+F     { toggle-window-floating;        }
-        Mod+Alt+O     { toggle-overview;               }
-        Mod+Ctrl+n    { consume-or-expel-window-left;  }
-        Mod+Ctrl+m    { consume-or-expel-window-right; }
+        Mod+W           { fullscreen-window;             }
+        Mod+C           { center-window;                 }
+        Mod+T           { toggle-column-tabbed-display;  }
+        Mod+Ctrl+f      { toggle-window-floating;        }
+        Mod+Ctrl+o      { toggle-overview;               }
+        Mod+Ctrl+n      { consume-or-expel-window-left;  }
+        Mod+Ctrl+m      { consume-or-expel-window-right; }
         
-        Mod+Shift+S { screenshot; }
-        Mod+Ctrl+E  { spawn        "togglescreen";}
+        Mod+Shift+S     { screenshot; }
+        Mod+Ctrl+E      { spawn        "togglescreen";}
 
-        XF86AudioRaiseVolume  { spawn "sh" "-c" "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+ && wp-vol"; }
-        XF86AudioLowerVolume  { spawn "sh" "-c" "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- && wp-vol"; }
-        XF86AudioMute         { spawn "wpctl"         "set-mute"   "@DEFAULT_AUDIO_SINK@" "toggle"; }
-        XF86MonBrightnessUp   { spawn "brightnessctl" "set"        "5%+";                 }
-        XF86MonBrightnessDown { spawn "brightnessctl" "set"        "5%-";                 }
+        Mod+WheelScrollDown      cooldown-ms=100 { focus-column-right;   }
+        Mod+WheelScrollUp        cooldown-ms=100 { focus-column-left;    }
+        Mod+Ctrl+WheelScrollUp   cooldown-ms=100 { focus-workspace-up;   }
+        Mod+Ctrl+WheelScrollDown cooldown-ms=100 { focus-workspace-down; }
+        XF86AudioRaiseVolume     { spawn "sh" "-c" "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+ && wp-vol"; }
+        XF86AudioLowerVolume     { spawn "sh" "-c" "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- && wp-vol"; }
+        XF86AudioMute            { spawn "wpctl"         "set-mute"   "@DEFAULT_AUDIO_SINK@" "toggle"; }
+        XF86MonBrightnessUp      { spawn "brightnessctl" "set"        "5%+";                 }
+        XF86MonBrightnessDown    { spawn "brightnessctl" "set"        "5%-";                 }
 }
 
 window-rule {
@@ -188,8 +194,10 @@ animations{
         off
 }
 
-// switch-events {
-//         lid-open {
-//                 spawn "sh" "-c" "hyprlock"
-//         }
-// }
+window-rule {
+    match app-id="qe-input"
+    open-floating true
+    open-on-output "focused"
+    default-column-width  { proportion 0.5; }
+    default-window-height { proportion 0.35; }
+}
