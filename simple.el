@@ -1,4 +1,6 @@
 ;;; -*- lexical-binding: t; -*-
+; this is a simple script that is aimed to be fast and portable on every machine with emacs isntalled,
+; it should only require the basic package that emacs have, with no other dependency required
 (setq-default tab-width 8)
 (setq-default indent-tabs-mode nil)
 (setq standard-indent 8)
@@ -90,7 +92,346 @@
   (add-hook 'completion-at-point-functions #'dabbrev-capf nil t))
 (add-hook 'prog-mode-hook #'my/add-dabbrev-capf)
 (add-hook 'text-mode-hook #'my/add-dabbrev-capf)
+
+;; 弹窗式补全（只依赖内置的 completion-preview 和 child frame）：
+;; - 光标后的行内虚线预览由 completion-preview 提供
+;; - 候选列表显示在光标下方的小弹窗中
+;; - C-n/C-p 切换候选，C-e 接受，C-g 关闭
+;; - 弹窗中选中的候选会同步成为光标后的虚线预览
 (when (require 'completion-preview nil t)
+  (setq completion-preview-message-format nil)
+
+  (defface my-completion-popup
+    '((t :background "#282a36" :foreground "#f8f8f2"))
+    "Face for completion popup candidates."
+    :group 'completion)
+
+  (defface my-completion-popup-selected
+    '((t :background "#44475a" :foreground "#f8f8f2" :weight bold))
+    "Face for the selected completion popup candidate."
+    :group 'completion)
+
+  (defcustom my-completion-popup-max-rows 12
+    "Maximum number of candidates shown in the completion popup."
+    :type 'natnum
+    :group 'completion)
+
+  (defvar my-completion-popup--frame nil)
+  (defvar my-completion-popup--buffer nil)
+  (defvar my-completion-popup--content nil)
+
+  (defconst my-completion-popup--frame-parameters
+    '((visibility . nil)
+      (width . 0) (height . 0)
+      (no-accept-focus . t)
+      (no-focus-on-map . t)
+      (no-other-frame . t)
+      (no-other-window . t)
+      (no-delete-other-windows . t)
+      (undecorated . t)
+      (border-width . 0)
+      (internal-border-width . 0)
+      (child-frame-border-width . 0)
+      (left-fringe . 0)
+      (right-fringe . 0)
+      (vertical-scroll-bars . nil)
+      (horizontal-scroll-bars . nil)
+      (menu-bar-lines . 0)
+      (tool-bar-lines . 0)
+      (tab-bar-lines . 0)
+      (unsplittable . t)
+      (cursor-type . nil)
+      (no-special-glyphs . t)
+      (desktop-dont-save . t)))
+
+  (defun my-completion-popup--ensure-buffer ()
+    "Return the buffer used by the completion popup."
+    (unless (buffer-live-p my-completion-popup--buffer)
+      (setq my-completion-popup--buffer
+            (get-buffer-create " *my-completion-popup*")
+            my-completion-popup--content nil)
+      (with-current-buffer my-completion-popup--buffer
+        (setq-local mode-line-format nil
+                    header-line-format nil
+                    tab-line-format nil
+                    cursor-type nil
+                    truncate-lines t
+                    show-trailing-whitespace nil
+                    display-line-numbers nil
+                    left-fringe-width 0
+                    right-fringe-width 0
+                    left-margin-width 0
+                    right-margin-width 0
+                    fringes-outside-margins 0
+                    buffer-undo-list t
+                    buffer-read-only t)
+        (use-local-map (make-sparse-keymap))))
+    my-completion-popup--buffer)
+
+  (defun my-completion-popup--ensure-frame ()
+    "Return a live popup child frame for the selected frame."
+    (let ((parent (selected-frame)))
+      (unless (and (frame-live-p my-completion-popup--frame)
+                   (eq (frame-parent my-completion-popup--frame) parent)
+                   (eq (display-graphic-p parent)
+                       (display-graphic-p my-completion-popup--frame))
+                   (window-live-p (frame-root-window my-completion-popup--frame)))
+        (when (frame-live-p my-completion-popup--frame)
+          (delete-frame my-completion-popup--frame))
+        (setq my-completion-popup--frame
+              (let ((after-make-frame-functions nil)
+                    (before-make-frame-hook nil)
+                    (window-min-height 1)
+                    (window-min-width 1))
+                (make-frame
+                 (append
+                  `((parent-frame . ,parent)
+                    (minibuffer . ,(minibuffer-window parent))
+                    (name . " *my-completion-popup*")
+                    (font . ,(frame-parameter parent 'font))
+                    (background-color . "#282a36")
+                    (foreground-color . "#f8f8f2"))
+                  my-completion-popup--frame-parameters)))))
+      (let ((win (frame-root-window my-completion-popup--frame)))
+        (unless (eq (window-buffer win) (my-completion-popup--ensure-buffer))
+          (set-window-buffer win (my-completion-popup--ensure-buffer)))
+        (set-window-dedicated-p win t)
+        (set-window-parameter win 'no-other-window t)
+        (set-window-parameter win 'no-delete-other-windows t))
+      (redirect-frame-focus my-completion-popup--frame parent)
+      my-completion-popup--frame))
+
+  (defun my-completion-popup--state ()
+    "Return (BEG CANDIDATES INDEX) for the current completion preview."
+    (when (and completion-preview-active-mode
+               (overlayp completion-preview--overlay)
+               (eq (overlay-buffer completion-preview--overlay)
+                   (current-buffer)))
+      (let* ((ov completion-preview--overlay)
+             (beg (overlay-get ov 'completion-preview-beg))
+             (base (or (overlay-get ov 'completion-preview-base) ""))
+             (common (or (overlay-get ov 'completion-preview-common) ""))
+             (suffixes (overlay-get ov 'completion-preview-suffixes))
+             (index (or (overlay-get ov 'completion-preview-index) 0)))
+        (when (and beg suffixes)
+          (list beg
+                (mapcar (lambda (suffix)
+                          (replace-regexp-in-string
+                           "[\n\r\t]" " "
+                           (substring-no-properties
+                            (concat base common suffix))))
+                        suffixes)
+                index)))))
+
+  (defun my-completion-popup--lines (candidates index width)
+    "Return propertized popup lines for CANDIDATES, highlighting INDEX."
+    (let* ((count (length candidates))
+           (max-rows (max 1
+                          (min my-completion-popup-max-rows
+                               (max 1 (1- (window-body-height))))))
+           (rows (min count max-rows))
+           (half (/ rows 2))
+           (lo (if (<= count rows)
+                   0
+                 (max 0 (min (- index half) (- count rows)))))
+           (lines nil))
+      (dotimes (i rows)
+        (let* ((j (+ lo i))
+               (candidate (nth j candidates))
+               (selected (= j index))
+               (text (concat (if selected "▸ " "  ") candidate))
+               (text (truncate-string-to-width text width nil nil "…"))
+               (text (concat text
+                             (make-string (max 0 (- width (string-width text)))
+                                          ?\s))))
+          (push (propertize text 'face (if selected
+                                           'my-completion-popup-selected
+                                         'my-completion-popup))
+                lines)))
+      (nreverse lines)))
+
+  (defun my-completion-popup--move (frame position width rows)
+    "Move FRAME below POSITION, flipping above when there is no room."
+    (let* ((edges (window-inside-pixel-edges))
+           (top (nth 1 edges))
+           (bottom (nth 3 edges))
+           (char-width (frame-char-width (selected-frame)))
+           (char-height (frame-char-height (selected-frame)))
+           (beg-posn (or (posn-at-point position) (posn-at-point)))
+           (point-posn (or (posn-at-point) beg-posn))
+           (beg-xy (posn-x-y beg-posn))
+           (point-xy (posn-x-y point-posn))
+           (x (+ (nth 0 edges) (or (car beg-xy) 0)))
+           (point-y (+ top (or (cdr point-xy) 0)))
+           (below-y (+ point-y char-height))
+           (popup-width (* width char-width))
+           (popup-height (* rows char-height))
+           (frame-width (frame-pixel-width (selected-frame)))
+           (x (max 0 (min x (- frame-width popup-width))))
+           (y (if (<= (+ below-y popup-height) bottom)
+                  below-y
+                (max top (- point-y popup-height)))))
+      (set-frame-position frame x y)))
+
+  (defun my-completion-popup--show (position candidates index)
+    "Show CANDIDATES with INDEX selected, anchored at POSITION."
+    (let* ((parent (selected-frame))
+           (max-width (apply #'max
+                             (mapcar (lambda (candidate)
+                                       (+ 3 (string-width candidate)))
+                                     candidates)))
+           (width (max 4 (min (1+ max-width)
+                              (max 4 (- (frame-width parent) 2)))))
+           (lines (my-completion-popup--lines candidates index width))
+           (content (mapconcat #'identity lines "\n"))
+           (frame (my-completion-popup--ensure-frame)))
+      (unless (equal content my-completion-popup--content)
+        (setq my-completion-popup--content content)
+        (with-current-buffer (my-completion-popup--ensure-buffer)
+          (let ((inhibit-read-only t)
+                (inhibit-modification-hooks t))
+            (erase-buffer)
+            (insert content)
+            (goto-char (point-min)))))
+      (let ((timer (frame-parameter frame 'my-completion-popup--hide-timer)))
+        (when (timerp timer)
+          (cancel-timer timer)
+          (set-frame-parameter frame 'my-completion-popup--hide-timer nil)))
+      (set-window-buffer (frame-root-window frame)
+                         (my-completion-popup--ensure-buffer))
+      (let ((window-min-height 1)
+            (window-min-width 1))
+        (set-frame-size frame (* width (frame-char-width parent))
+                        (* (length lines) (frame-char-height parent)) t))
+      (my-completion-popup--move frame position width (length lines))
+      (make-frame-visible frame)))
+
+  (defun my-completion-popup--hide-now (frame)
+    "Hide FRAME immediately and clear its contents."
+    (when (frame-live-p frame)
+      (set-frame-parameter frame 'my-completion-popup--hide-timer nil)
+      (when (frame-visible-p frame)
+        (make-frame-invisible frame))
+      (when (buffer-live-p my-completion-popup--buffer)
+        (with-current-buffer my-completion-popup--buffer
+          (let ((inhibit-read-only t))
+            (erase-buffer))))
+      (setq my-completion-popup--content nil)))
+
+  (defun my-completion-popup--hide ()
+    "Hide the completion popup."
+    (when (and (frame-live-p my-completion-popup--frame)
+               (frame-visible-p my-completion-popup--frame))
+      (let ((frame my-completion-popup--frame))
+        (if (display-graphic-p frame)
+            (my-completion-popup--hide-now frame)
+          ;; TTY child frames are safer to hide after the current redisplay.
+          (let ((timer (frame-parameter frame 'my-completion-popup--hide-timer)))
+            (unless (timerp timer)
+              (set-frame-parameter
+               frame 'my-completion-popup--hide-timer
+               (run-at-time 0 nil #'my-completion-popup--hide-now frame))))))))
+
+  (defun my-completion-popup--selecting-p ()
+    "Return non-nil if there are several candidates to select from."
+    (when-let* ((state (my-completion-popup--state)))
+      (>= (length (nth 1 state)) 2)))
+
+  (defun my-completion-popup--refresh ()
+    "Synchronize the completion popup with the completion preview."
+    (condition-case nil
+        (if-let* ((state (my-completion-popup--state)))
+            (pcase-let ((`(,beg ,candidates ,index) state))
+              (if (and (>= (length candidates) 2)
+                       (or (display-graphic-p)
+                           (featurep 'tty-child-frames)))
+                  (my-completion-popup--show
+                   beg candidates (min index (1- (length candidates))))
+                (my-completion-popup--hide)))
+          (my-completion-popup--hide))
+      (error (my-completion-popup--hide))))
+
+  (defun my-completion-popup--window-change (&rest _)
+    "Hide the completion popup when the current window changes."
+    (my-completion-popup--hide))
+
+  (defun my-completion-popup--frame-deleted (frame)
+    "Clear popup state when FRAME is deleted."
+    (when (eq frame my-completion-popup--frame)
+      (setq my-completion-popup--frame nil
+            my-completion-popup--content nil)))
+
+  (defun my-completion-popup--setup ()
+    "Install popup hooks for the current completion-preview buffer."
+    (unless (eq (current-buffer) my-completion-popup--buffer)
+      (if completion-preview-mode
+          (progn
+            ;; Run after `completion-preview--post-command'.
+            (add-hook 'post-command-hook #'my-completion-popup--refresh 90 t)
+            (add-hook 'window-selection-change-functions
+                      #'my-completion-popup--window-change nil t)
+            (add-hook 'window-buffer-change-functions
+                      #'my-completion-popup--window-change nil t)
+            (add-hook 'kill-buffer-hook #'my-completion-popup--hide nil t))
+        (remove-hook 'post-command-hook #'my-completion-popup--refresh t)
+        (remove-hook 'window-selection-change-functions
+                     #'my-completion-popup--window-change t)
+        (remove-hook 'window-buffer-change-functions
+                     #'my-completion-popup--window-change t)
+        (remove-hook 'kill-buffer-hook #'my-completion-popup--hide t)
+        (my-completion-popup--hide))))
+
+  (defun my-completion-popup-next ()
+    "Select the next popup candidate, or move down when there is no popup."
+    (interactive)
+    (if (my-completion-popup--selecting-p)
+        (completion-preview-next-candidate 1)
+      (completion-preview-active-mode -1)
+      (my-completion-popup--hide)
+      (line-move 1)))
+
+  (defun my-completion-popup-prev ()
+    "Select the previous popup candidate, or move up when there is no popup."
+    (interactive)
+    (if (my-completion-popup--selecting-p)
+        (completion-preview-prev-candidate 1)
+      (completion-preview-active-mode -1)
+      (my-completion-popup--hide)
+      (line-move -1)))
+
+  (defun my-completion-popup-quit ()
+    "Dismiss the completion popup and preview."
+    (interactive)
+    (completion-preview-active-mode -1)
+    (my-completion-popup--hide))
+
+  ;; These commands update the preview themselves; don't let the
+  ;; preview's post-command handler hide it before the popup refreshes.
+  (dolist (command '(my-completion-popup-next my-completion-popup-prev))
+    (add-to-list 'completion-preview--internal-commands command))
+
+  (define-key completion-preview-active-mode-map (kbd "C-n")
+              #'my-completion-popup-next)
+  (define-key completion-preview-active-mode-map (kbd "C-p")
+              #'my-completion-popup-prev)
+  (define-key completion-preview-active-mode-map (kbd "C-e")
+              #'completion-preview-insert)
+  (define-key completion-preview-active-mode-map (kbd "RET")
+              #'completion-preview-insert)
+  (define-key completion-preview-active-mode-map (kbd "C-g")
+              #'my-completion-popup-quit)
+  ;; TAB should keep its normal indentation/prefix behavior.
+  (define-key completion-preview-active-mode-map (kbd "C-i") nil)
+
+  (add-hook 'completion-preview-mode-hook #'my-completion-popup--setup)
+  (add-hook 'minibuffer-setup-hook #'my-completion-popup--hide)
+  (add-hook 'delete-frame-functions #'my-completion-popup--frame-deleted)
+
+  ;; 让行内预览更像一条淡色的虚线。
+  (set-face-attribute 'completion-preview nil
+                      :foreground "#6272a4"
+                      :underline '(:color "#6272a4" :style dashes))
+
   (global-completion-preview-mode 1))
 
 ;; flash.nvim 风格的可见区域搜索跳转。
